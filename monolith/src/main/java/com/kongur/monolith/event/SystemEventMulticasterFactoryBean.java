@@ -30,7 +30,7 @@ public class SystemEventMulticasterFactoryBean implements FactoryBean<SystemEven
     private List<SystemListener<SystemEvent>> listeners;
 
     /**
-     * 是否自动收集监听器，如果为true, 那么会从容器中自动获取类型为SmartSystemListener的所有监听器，并注册到SystemEventMulticaster里面，默认为true
+     * 是否自动收集监听器，如果为true, 那么会从容器中自动获取类型为SystemListener的所有监听器，并注册到SystemEventMulticaster里面，默认为true
      */
     private boolean                           autoCollect = true;
 
@@ -54,9 +54,14 @@ public class SystemEventMulticasterFactoryBean implements FactoryBean<SystemEven
         }
 
         if (autoCollect) {
-            Map<String, SmartSystemListener> listeners = applicationContext.getBeansOfType(SmartSystemListener.class);
+            Map<String, SystemListener> listeners = applicationContext.getBeansOfType(SystemListener.class);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("auto-collect find " + (listeners != null ? listeners.size() : 0) + " listeners.");
+            }
+
             if (listeners != null && !listeners.isEmpty()) {
-                for (Entry<String, SmartSystemListener> entry : listeners.entrySet()) {
+                for (Entry<String, SystemListener> entry : listeners.entrySet()) {
                     systemEventMulticaster.addListener(entry.getValue());
                 }
             }
