@@ -52,5 +52,12 @@
 		<version>1.7</version>
 	</dependency>
 
+    <!-- 
+    <dependency>
+		<groupId>com.alibaba.cobar</groupId>
+		<artifactId>cobar-client</artifactId>
+		<version>1.0.3</version>
+	</dependency>
+	 -->
   </dependencies>
 </project>
