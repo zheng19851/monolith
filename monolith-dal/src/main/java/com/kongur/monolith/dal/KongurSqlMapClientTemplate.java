@@ -198,8 +198,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 return batchDelete(statementName, (Collection) parameterObject);
             }
 
-            // 分库分表, parameterObject为null 时，直接跳过
-            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
+            // 分库分表
+            if (isPartitioningBehaviorEnabled()) {
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
                 Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
@@ -288,8 +288,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 return batchInsert(statementName, (Collection) parameterObject);
             }
 
-            // 分库分表, parameterObject为null 时，直接跳过
-            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
+            // 分库分表
+            if (isPartitioningBehaviorEnabled()) {
                 /**
                  * sometimes, client will submit batch insert request like "insert into ..values(), (), ()...", it's a
                  * rare situation, but does exist, so we will create new executor on this kind of request processing,
@@ -587,8 +587,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
 
         try {
 
-            // 分库分表, parameterObject为null 时，直接跳过
-            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
+            // 分库分表
+            if (isPartitioningBehaviorEnabled()) {
 
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
                 Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
@@ -740,8 +740,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
 
         try {
 
-            // 分库分表, parameterObject为null 时，直接跳过
-            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
+            // 分库分表
+            if (isPartitioningBehaviorEnabled()) {
 
                 // 根据SQL ID和参数对请求进行路由
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
@@ -899,11 +899,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
 
         try {
 
-            RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
-
             // 分库分表
             if (isPartitioningBehaviorEnabled()) {
+
+                RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
+                final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
@@ -937,11 +937,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 }
             } // end if for partitioning status checking
 
-            // 分表
+            // 不分库分表
             if (parameterObject == null) {
                 super.queryWithRowHandler(statementName, rowHandler);
             } else {
-                super.queryWithRowHandler(statementName, internalObject, rowHandler);
+                super.queryWithRowHandler(statementName, parameterObject, rowHandler);
             }
 
         } finally {
@@ -982,8 +982,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 return batchUpdate(statementName, (Collection) parameterObject);
             }
 
-            // 分库分表, parameterObject为null 时，直接跳过
-            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
+            // 分库分表
+            if (isPartitioningBehaviorEnabled()) {
 
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
                 Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
