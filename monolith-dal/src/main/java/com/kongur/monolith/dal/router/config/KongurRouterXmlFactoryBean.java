@@ -22,6 +22,8 @@ import com.kongur.monolith.dal.router.rules.ibatis.KongurIBatisSqlActionSharding
 import com.thoughtworks.xstream.XStream;
 
 /**
+ * ´´½¨DefaultRouter
+ * 
  * @author zhengwei
  */
 public class KongurRouterXmlFactoryBean extends AbstractKongurRouterConfigurationFactoryBean {
@@ -47,13 +49,11 @@ public class KongurRouterXmlFactoryBean extends AbstractKongurRouterConfiguratio
 
         for (KongurInternalRule rule : rules) {
 
-            KongurInternalRule kongurInternalRule = (KongurInternalRule)rule;
-
             String namespace = StringUtils.trimToEmpty(rule.getNamespace());
             String sqlAction = StringUtils.trimToEmpty(rule.getSqlmap());
             String shardingExpression = StringUtils.trimToEmpty(rule.getShardingExpression());
             String destinations = StringUtils.trimToEmpty(rule.getShards());
-            String tableResolveExp = StringUtils.trimToEmpty(kongurInternalRule.getTableResolveExp());
+            String tableResolveExp = StringUtils.trimToEmpty(rule.getTableResolveExp());
 
             Validate.notEmpty(destinations, "destination shards must be given explicitly.");
 

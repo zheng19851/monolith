@@ -35,11 +35,6 @@ public abstract class AbstractKongurRouterConfigurationFactoryBean implements Fa
 
     private Map<String, Object> functionsMap = new HashMap<String, Object>();
 
-    /**
-     * 默认的数据源ID
-     */
-    private String              defaultDataSourseId;
-
     public Object getObject() throws Exception {
         return this.router;
     }
@@ -151,14 +146,6 @@ public abstract class AbstractKongurRouterConfigurationFactoryBean implements Fa
 
     public Map<String, Object> getFunctionsMap() {
         return functionsMap;
-    }
-
-    public String getDefaultDataSourseId() {
-        return defaultDataSourseId;
-    }
-
-    public void setDefaultDataSourseId(String defaultDataSourseId) {
-        this.defaultDataSourseId = defaultDataSourseId;
     }
 
     public DefaultRouter getRouter() {

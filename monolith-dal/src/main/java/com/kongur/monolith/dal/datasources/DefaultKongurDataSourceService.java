@@ -50,9 +50,9 @@ public class DefaultKongurDataSourceService extends DefaultCobarDataSourceServic
         }
 
         for (CobarDataSourceDescriptor descriptor : getDataSourceDescriptors()) {
-            
+
             KongurDataSourceDescriptor kongurDescriptor = (KongurDataSourceDescriptor) descriptor;
-            
+
             Validate.notEmpty(descriptor.getIdentity());
             Validate.notNull(descriptor.getTargetDataSource());
 
@@ -62,9 +62,9 @@ public class DefaultKongurDataSourceService extends DefaultCobarDataSourceServic
                 dataSourceToUse = getHaDataSourceCreator().createHADataSource(descriptor);
             }
 
-//            DataSource proxyDataSource = new LazyConnectionDataSourceProxy(dataSourceToUse);
-//            getDataSources().put(descriptor.getIdentity(), proxyDataSource);
-            
+            // DataSource proxyDataSource = new LazyConnectionDataSourceProxy(dataSourceToUse);
+            // getDataSources().put(descriptor.getIdentity(), proxyDataSource);
+
             getDataSources().put(descriptor.getIdentity(), dataSourceToUse);
             if (kongurDescriptor.isDefaultDataSource()) {
                 defaultDataSource = dataSourceToUse;
@@ -116,10 +116,12 @@ public class DefaultKongurDataSourceService extends DefaultCobarDataSourceServic
 
     public SortedMap<String, DataSource> getDataSourses(List<String> dataSourceIdList, boolean sort) {
 
-        SortedMap<String, DataSource> resultMap = new TreeMap<String, DataSource>();
+        SortedMap<String, DataSource> resultMap = null;
 
         if (CollectionUtils.isNotEmpty(dataSourceIdList)) {
 
+            resultMap = new TreeMap<String, DataSource>();
+            
             if (sort) {
                 Collections.sort(dataSourceIdList);
             }
