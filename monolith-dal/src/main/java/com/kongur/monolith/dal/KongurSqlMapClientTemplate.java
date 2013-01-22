@@ -89,7 +89,7 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
      * if no router is found, the CobarSqlMapClientTemplate will act with behaviors like its parent, the
      * SqlMapClientTemplate.
      */
-    private Router<IBatisRoutingFact>      router;
+    private Router<IBatisRoutingFact>            router;
 
     /**
      * if you want to do SQL auditing, inject an {@link ISqlAuditor} for use.<br>
@@ -130,6 +130,16 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
      * between the sql action and the merging logic provider.
      */
     private Map<String, IMerger<Object, Object>> mergers                         = new HashMap<String, IMerger<Object, Object>>();
+
+    /**
+     * 分表成功后，设置到ibatis上下文里的参数名称
+     */
+    private static final String                  DEFAULT_TABLE_SUFFIX_NAME       = "tableSuffix";
+
+    /**
+     * 分表成功后，设置到ibatis上下文里的参数名称, 默认是'tableSuffix'
+     */
+    private String                               tableSuffixName                 = DEFAULT_TABLE_SUFFIX_NAME;
 
     /**
      * NOTE: don't use this method for distributed data access.<br>
@@ -188,10 +198,10 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 return batchDelete(statementName, (Collection) parameterObject);
             }
 
-            RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
-
-            if (isPartitioningBehaviorEnabled()) {
+            // 分库分表, parameterObject为null 时，直接跳过
+            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
+                RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
+                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
@@ -222,11 +232,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 }
             } // end if for partitioning status checking
 
-            if (internalObject == null) {
+            if (parameterObject == null) {
                 return super.delete(statementName);
             }
 
-            return super.delete(statementName, internalObject);
+            return super.delete(statementName, parameterObject);
 
         } finally {
             if (isProfileLongTimeRunningSql()) {
@@ -278,7 +288,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 return batchInsert(statementName, (Collection) parameterObject);
             }
 
-            if (isPartitioningBehaviorEnabled()) {
+            // 分库分表, parameterObject为null 时，直接跳过
+            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
                 /**
                  * sometimes, client will submit batch insert request like "insert into ..values(), (), ()...", it's a
                  * rare situation, but does exist, so we will create new executor on this kind of request processing,
@@ -328,10 +339,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
 
             } // end if for partitioning status checking
 
-            RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+            // 不分库分表
+            // RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
+            // Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
-            return super.insert(statementName, internalObject);
+            return super.insert(statementName, parameterObject);
         } finally {
             if (isProfileLongTimeRunningSql()) {
                 long interval = System.currentTimeMillis() - startTimestamp;
@@ -575,11 +587,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
 
         try {
 
-            RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+            // 分库分表, parameterObject为null 时，直接跳过
+            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
 
-            // 分库分表
-            if (isPartitioningBehaviorEnabled()) {
+                RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
+                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
@@ -610,10 +622,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 }
             } // end if for partitioning status checking
 
+            // 不分库分表
             if (skipResults == null || maxResults == null) {
-                return super.queryForList(statementName, internalObject);
+                return super.queryForList(statementName, parameterObject);
             } else {
-                return super.queryForList(statementName, internalObject, skipResults, maxResults);
+                return super.queryForList(statementName, parameterObject, skipResults, maxResults);
             }
         } finally {
             if (isProfileLongTimeRunningSql()) {
@@ -654,11 +667,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
         long startTimestamp = System.currentTimeMillis();
         try {
 
-            RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
-
             // 分库分表
             if (isPartitioningBehaviorEnabled()) {
+
+                RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
+                final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
@@ -694,11 +707,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 }
             } // end if for partitioning status checking
 
-            // 分表
+            // 不分库分表
             if (valueProperty == null) {
-                return super.queryForMap(statementName, internalObject, keyProperty);
+                return super.queryForMap(statementName, parameterObject, keyProperty);
             } else {
-                return super.queryForMap(statementName, internalObject, keyProperty, valueProperty);
+                return super.queryForMap(statementName, parameterObject, keyProperty, valueProperty);
             }
         } finally {
             if (isProfileLongTimeRunningSql()) {
@@ -727,12 +740,12 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
 
         try {
 
-            // 根据SQL ID和参数对请求进行路由
-            RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+            // 分库分表, parameterObject为null 时，直接跳过
+            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
 
-            // 分库分表
-            if (isPartitioningBehaviorEnabled()) {
+                // 根据SQL ID和参数对请求进行路由
+                RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
+                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
@@ -763,11 +776,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 }
             } // end if for partitioning status checking
 
-            // 分表
+            // 不分库分表
             if (resultObject == null) {
-                return super.queryForObject(statementName, internalObject);
+                return super.queryForObject(statementName, parameterObject);
             } else {
-                return super.queryForObject(statementName, internalObject, resultObject);
+                return super.queryForObject(statementName, parameterObject, resultObject);
             }
 
         } finally {
@@ -794,12 +807,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
         if (parameterObject == null) {
             return null;
         }
-        
-        
-        RoutingResult kongurRoutingResult = (RoutingResult) routingResult;
-        
 
-        String tableSuffix = kongurRoutingResult.getTableSuffix();
+        String tableSuffix = routingResult.getTableSuffix();
         Object internalObject = parameterObject;
 
         if (StringUtils.isNotBlank(tableSuffix)) {
@@ -829,7 +838,7 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                         logger.debug("internalParams=" + internalParams);
                     }
 
-                    internalParams.put("tableSuffix", tableSuffix);
+                    internalParams.put(tableSuffixName, tableSuffix);
                     internalObject = internalParams;
                 }
             }
@@ -973,11 +982,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 return batchUpdate(statementName, (Collection) parameterObject);
             }
 
-            RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+            // 分库分表, parameterObject为null 时，直接跳过
+            if (isPartitioningBehaviorEnabled() && parameterObject != null) {
 
-            // 分库分表
-            if (isPartitioningBehaviorEnabled()) {
+                RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
+                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
@@ -1008,7 +1017,8 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
                 }
             } // end if for partitioning status checking
 
-            return super.update(statementName, internalObject);
+            return super.update(statementName, parameterObject);
+
         } finally {
             if (isProfileLongTimeRunningSql()) {
                 long interval = System.currentTimeMillis() - startTimestamp;
@@ -1319,7 +1329,7 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
     public long getLongTimeRunningSqlIntervalThreshold() {
         return longTimeRunningSqlIntervalThreshold;
     }
-    
+
     public void setRouter(Router<IBatisRoutingFact> router) {
         this.router = router;
     }
@@ -1475,6 +1485,14 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
 
         protected abstract void doAction(SqlMapExecutor executor, String statementName, Object paramObj)
                                                                                                         throws SQLException;
+    }
+
+    public String getTableSuffixName() {
+        return tableSuffixName;
+    }
+
+    public void setTableSuffixName(String tableSuffixName) {
+        this.tableSuffixName = tableSuffixName;
     }
 
 }

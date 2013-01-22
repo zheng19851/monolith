@@ -56,6 +56,8 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
         }
 
         RoutingResult result = new RoutingResult();
+
+        // datasource ids
         result.setResourceIdentities(new ArrayList<String>());
 
         IRoutingRule<IBatisRoutingFact, List<String>> ruleToUse = null;
@@ -71,11 +73,13 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
 
         if (ruleToUse != null) {
             logger.info("matched with rule:{} with fact:{}", ruleToUse, routingFact);
-            result.getResourceIdentities().addAll(ruleToUse.action());
+            result.addResourceIdentities(ruleToUse.action());
 
             AbstractKongurIBatisOrientedRule useRule = (AbstractKongurIBatisOrientedRule) ruleToUse;
+
             // TODO zhengwei modified 2011-12-1
-            result.setTableSuffix(useRule.resolveTableSuffix(routingFact));
+            String tableSuffix = useRule.resolveTableSuffix(routingFact);
+            result.setTableSuffix(tableSuffix);
         } else {
             logger.info("No matched rule found for routing fact:{}", routingFact);
         }

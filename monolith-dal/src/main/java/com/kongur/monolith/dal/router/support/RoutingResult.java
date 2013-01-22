@@ -8,6 +8,8 @@
  */
 package com.kongur.monolith.dal.router.support;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author zhengwei
@@ -25,6 +27,15 @@ public class RoutingResult extends com.alibaba.cobar.client.router.support.Routi
 
     public void setTableSuffix(String tableSuffix) {
         this.tableSuffix = tableSuffix;
+    }
+
+    public void addResourceIdentities(List<String> resourceIdentities) {
+        if (super.getResourceIdentities() == null) {
+            setResourceIdentities(new ArrayList<String>());
+        }
+
+        getResourceIdentities().addAll(resourceIdentities);
+
     }
 
 }
