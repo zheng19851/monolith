@@ -6,7 +6,7 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-3.0.xsd">
            
-	<context:component-scan base-package="com.kongur.monolith.biz" />
+	<context:component-scan base-package="com.kongur.monolith.biz.service" />
 	
 	<bean id="attributesConfigManager" class="com.kongur.monolith.session.attibute.DefaultAttributesConfigManager" init-method="init">
 	    <property name="attributeConfigs">
@@ -16,7 +16,13 @@
 	                    <property name="key" value="username"></property>
 	                    <property name="clientKey" value="username11"></property>
 	                </bean>
-	                
+	            </entry>
+	            
+	            <entry key="sessionID">
+	                <bean class="com.kongur.monolith.session.attibute.AttributeConfigDO">
+	                    <property name="key" value="sessionID"></property>
+	                    <property name="clientKey" value="sessionID11"></property>
+	                </bean>
 	            </entry>
 	        </map>
 	    </property>

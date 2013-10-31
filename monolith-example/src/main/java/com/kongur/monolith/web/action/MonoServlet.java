@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.kongur.monolith.session.MonoHttpSession;
+
 public class MonoServlet extends HttpServlet {
 
     /**
@@ -24,6 +26,10 @@ public class MonoServlet extends HttpServlet {
 
         String username = (String) req.getSession().getAttribute("username");
 
+        String sessionId = (String) req.getSession().getAttribute(MonoHttpSession.SESSION_ID);
+        
+        System.out.println("sessionId=" + sessionId);
+        
         if (StringUtils.isBlank(username)) {
             System.out.println("no username");
             req.getSession().setAttribute("username", "zhangsan");
