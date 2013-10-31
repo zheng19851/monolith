@@ -4,7 +4,7 @@ package com.kongur.monolith.dal.router.config.vo;
 /**
  * @author zhengwei
  */
-public class KongurInternalRule {
+public class MonoInternalRule {
 
     private String namespace;
     private String sqlmap;

@@ -13,12 +13,12 @@ import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 import com.alibaba.cobar.client.support.utils.CollectionUtils;
 import com.alibaba.cobar.client.support.utils.MapUtils;
 import com.kongur.monolith.dal.router.DefaultRouter;
-import com.kongur.monolith.dal.router.config.vo.KongurInternalRule;
-import com.kongur.monolith.dal.router.config.vo.KongurInternalRules;
-import com.kongur.monolith.dal.router.rules.ibatis.KongurIBatisNamespaceRule;
-import com.kongur.monolith.dal.router.rules.ibatis.KongurIBatisNamespaceShardingRule;
-import com.kongur.monolith.dal.router.rules.ibatis.KongurIBatisSqlActionRule;
-import com.kongur.monolith.dal.router.rules.ibatis.KongurIBatisSqlActionShardingRule;
+import com.kongur.monolith.dal.router.config.vo.MonoInternalRule;
+import com.kongur.monolith.dal.router.config.vo.MonoInternalRules;
+import com.kongur.monolith.dal.router.rules.ibatis.MonoIBatisNamespaceRule;
+import com.kongur.monolith.dal.router.rules.ibatis.MonoIBatisNamespaceShardingRule;
+import com.kongur.monolith.dal.router.rules.ibatis.MonoIBatisSqlActionRule;
+import com.kongur.monolith.dal.router.rules.ibatis.MonoIBatisSqlActionShardingRule;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -26,7 +26,7 @@ import com.thoughtworks.xstream.XStream;
  * 
  * @author zhengwei
  */
-public class KongurRouterXmlFactoryBean extends AbstractKongurRouterConfigurationFactoryBean {
+public class MonoRouterXmlFactoryBean extends AbstractMonoRouterConfigurationFactoryBean {
 
     @Override
     protected void assembleRulesForRouter(DefaultRouter router, Resource configLocation,
@@ -36,18 +36,18 @@ public class KongurRouterXmlFactoryBean extends AbstractKongurRouterConfiguratio
                                           Set<IRoutingRule<IBatisRoutingFact, List<String>>> namespaceRules)
                                                                                                             throws IOException {
         XStream xstream = new XStream();
-        xstream.alias("rules", KongurInternalRules.class);
-        xstream.alias("rule", KongurInternalRule.class);
-        xstream.addImplicitCollection(KongurInternalRules.class, "rules");
-        xstream.useAttributeFor(KongurInternalRule.class, "merger");
+        xstream.alias("rules", MonoInternalRules.class);
+        xstream.alias("rule", MonoInternalRule.class);
+        xstream.addImplicitCollection(MonoInternalRules.class, "rules");
+        xstream.useAttributeFor(MonoInternalRule.class, "merger");
 
-        KongurInternalRules internalRules = (KongurInternalRules) xstream.fromXML(configLocation.getInputStream());
-        List<KongurInternalRule> rules = internalRules.getRules();
+        MonoInternalRules internalRules = (MonoInternalRules) xstream.fromXML(configLocation.getInputStream());
+        List<MonoInternalRule> rules = internalRules.getRules();
         if (CollectionUtils.isEmpty(rules)) {
             return;
         }
 
-        for (KongurInternalRule rule : rules) {
+        for (MonoInternalRule rule : rules) {
 
             String namespace = StringUtils.trimToEmpty(rule.getNamespace());
             String sqlAction = StringUtils.trimToEmpty(rule.getSqlmap());
@@ -67,12 +67,12 @@ public class KongurRouterXmlFactoryBean extends AbstractKongurRouterConfiguratio
 
             if (StringUtils.isNotEmpty(namespace)) {
                 if (StringUtils.isEmpty(shardingExpression)) {
-                    KongurIBatisNamespaceRule namespaceRule = new KongurIBatisNamespaceRule(namespace, destinations);
+                    MonoIBatisNamespaceRule namespaceRule = new MonoIBatisNamespaceRule(namespace, destinations);
                     namespaceRule.setTableResolveExp(tableResolveExp);
                     namespaceRule.setFunctionMap(getFunctionsMap());
                     namespaceRules.add(namespaceRule);
                 } else {
-                    KongurIBatisNamespaceShardingRule insr = new KongurIBatisNamespaceShardingRule(namespace, destinations,
+                    MonoIBatisNamespaceShardingRule insr = new MonoIBatisNamespaceShardingRule(namespace, destinations,
                                                                                        shardingExpression);
                     if (MapUtils.isNotEmpty(getFunctionsMap())) {
                         insr.setFunctionMap(getFunctionsMap());
@@ -85,12 +85,12 @@ public class KongurRouterXmlFactoryBean extends AbstractKongurRouterConfiguratio
             }
             if (StringUtils.isNotEmpty(sqlAction)) {
                 if (StringUtils.isEmpty(shardingExpression)) {
-                    KongurIBatisSqlActionRule sqlActionRule = new KongurIBatisSqlActionRule(sqlAction, destinations);
+                    MonoIBatisSqlActionRule sqlActionRule = new MonoIBatisSqlActionRule(sqlAction, destinations);
                     sqlActionRule.setTableResolveExp(tableResolveExp);
                     sqlActionRule.setFunctionMap(getFunctionsMap());
                     sqlActionRules.add(sqlActionRule);
                 } else {
-                    KongurIBatisSqlActionShardingRule issr = new KongurIBatisSqlActionShardingRule(sqlAction, destinations,
+                    MonoIBatisSqlActionShardingRule issr = new MonoIBatisSqlActionShardingRule(sqlAction, destinations,
                                                                                        shardingExpression);
                     if (MapUtils.isNotEmpty(getFunctionsMap())) {
                         issr.setFunctionMap(getFunctionsMap());

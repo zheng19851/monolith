@@ -9,11 +9,11 @@ import com.alibaba.cobar.client.CobarSqlMapClientDaoSupport;
 /**
  * @author zhengwei
  */
-public class KongurSqlMapClientDaoSupport extends CobarSqlMapClientDaoSupport {
+public class MonoSqlMapClientDaoSupport extends CobarSqlMapClientDaoSupport {
 
     protected boolean isPartitionBehaviorEnabled() {
-        if (getSqlMapClientTemplate() instanceof KongurSqlMapClientTemplate) {
-            return ((KongurSqlMapClientTemplate) getSqlMapClientTemplate()).isPartitioningBehaviorEnabled();
+        if (getSqlMapClientTemplate() instanceof MonoSqlMapClientTemplate) {
+            return ((MonoSqlMapClientTemplate) getSqlMapClientTemplate()).isPartitioningBehaviorEnabled();
         }
         return false;
     }

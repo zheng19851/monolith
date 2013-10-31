@@ -23,7 +23,7 @@ import com.kongur.monolith.dal.router.DefaultRouter;
  * 
  * @author zhengwei
  */
-public abstract class AbstractKongurRouterConfigurationFactoryBean implements FactoryBean, InitializingBean {
+public abstract class AbstractMonoRouterConfigurationFactoryBean implements FactoryBean, InitializingBean {
 
     private DefaultRouter       router;
 

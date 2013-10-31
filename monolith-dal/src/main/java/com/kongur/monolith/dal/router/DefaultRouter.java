@@ -12,7 +12,7 @@ import com.alibaba.cobar.client.router.rules.IRoutingRule;
 import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 import com.alibaba.cobar.client.support.LRUMap;
 import com.alibaba.cobar.client.support.utils.CollectionUtils;
-import com.kongur.monolith.dal.router.rules.ibatis.AbstractKongurIBatisOrientedRule;
+import com.kongur.monolith.dal.router.rules.ibatis.AbstractMonoIBatisOrientedRule;
 import com.kongur.monolith.dal.router.support.RoutingResult;
 
 /**
@@ -75,7 +75,7 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
             logger.info("matched with rule:{} with fact:{}", ruleToUse, routingFact);
             result.addResourceIdentities(ruleToUse.action());
 
-            AbstractKongurIBatisOrientedRule useRule = (AbstractKongurIBatisOrientedRule) ruleToUse;
+            AbstractMonoIBatisOrientedRule useRule = (AbstractMonoIBatisOrientedRule) ruleToUse;
 
             // TODO zhengwei modified 2011-12-1
             String tableSuffix = useRule.resolveTableSuffix(routingFact);

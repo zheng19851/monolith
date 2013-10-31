@@ -15,7 +15,7 @@ import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 /**
  * @author zhengwei
  */
-public abstract class AbstractKongurIBatisOrientedRule extends AbstractIBatisOrientedRule {
+public abstract class AbstractMonoIBatisOrientedRule extends AbstractIBatisOrientedRule {
 
     protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -24,11 +24,11 @@ public abstract class AbstractKongurIBatisOrientedRule extends AbstractIBatisOri
      */
     private String                   tableResolveExp;
 
-    public AbstractKongurIBatisOrientedRule(String pattern, String action) {
+    public AbstractMonoIBatisOrientedRule(String pattern, String action) {
         super(pattern, action);
     }
 
-    public AbstractKongurIBatisOrientedRule(String pattern, String action, String attributePattern) {
+    public AbstractMonoIBatisOrientedRule(String pattern, String action, String attributePattern) {
         super(pattern, action, attributePattern);
     }
 

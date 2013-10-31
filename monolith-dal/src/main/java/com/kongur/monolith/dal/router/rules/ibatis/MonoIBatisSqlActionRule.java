@@ -8,9 +8,9 @@ import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 /**
  * @author zhengwei
  */
-public class KongurIBatisSqlActionRule extends AbstractKongurIBatisOrientedRule {
+public class MonoIBatisSqlActionRule extends AbstractMonoIBatisOrientedRule {
 
-    public KongurIBatisSqlActionRule(String pattern, String action) {
+    public MonoIBatisSqlActionRule(String pattern, String action) {
         super(pattern, action);
     }
 

@@ -8,9 +8,9 @@ import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 /**
  * @author zhengwei
  */
-public class KongurIBatisNamespaceRule extends AbstractKongurIBatisOrientedRule {
+public class MonoIBatisNamespaceRule extends AbstractMonoIBatisOrientedRule {
 
-    public KongurIBatisNamespaceRule(String pattern, String action) {
+    public MonoIBatisNamespaceRule(String pattern, String action) {
         super(pattern, action);
     }
 

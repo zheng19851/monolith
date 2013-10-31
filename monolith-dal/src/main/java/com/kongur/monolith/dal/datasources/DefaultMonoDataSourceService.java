@@ -21,7 +21,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * 
  * @author zhengwei
  */
-public class DefaultKongurDataSourceService extends DefaultCobarDataSourceService implements KongurDataSourceService {
+public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService implements MonoDataSourceService {
 
     /**
      * add by zhengwei 默认的数据源
@@ -51,7 +51,7 @@ public class DefaultKongurDataSourceService extends DefaultCobarDataSourceServic
 
         for (CobarDataSourceDescriptor descriptor : getDataSourceDescriptors()) {
 
-            KongurDataSourceDescriptor kongurDescriptor = (KongurDataSourceDescriptor) descriptor;
+            MonoDataSourceDescriptor kongurDescriptor = (MonoDataSourceDescriptor) descriptor;
 
             Validate.notEmpty(descriptor.getIdentity());
             Validate.notNull(descriptor.getTargetDataSource());

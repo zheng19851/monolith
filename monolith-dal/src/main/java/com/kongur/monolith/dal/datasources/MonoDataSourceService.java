@@ -13,7 +13,7 @@ import com.alibaba.cobar.client.datasources.ICobarDataSourceService;
  * 
  * @author zhengwei
  */
-public interface KongurDataSourceService extends ICobarDataSourceService {
+public interface MonoDataSourceService extends ICobarDataSourceService {
 
     /**
      * 默认的数据源

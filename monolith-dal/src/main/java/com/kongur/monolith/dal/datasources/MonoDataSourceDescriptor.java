@@ -5,7 +5,7 @@ import com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor;
 /**
  * @author zhengwei
  */
-public class KongurDataSourceDescriptor extends CobarDataSourceDescriptor {
+public class MonoDataSourceDescriptor extends CobarDataSourceDescriptor {
 
     /**
      * 是否是默认的数据源

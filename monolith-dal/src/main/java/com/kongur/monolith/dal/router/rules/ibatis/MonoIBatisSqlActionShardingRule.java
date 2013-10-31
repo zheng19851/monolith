@@ -11,21 +11,23 @@ import org.mvel2.integration.impl.MapVariableResolverFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.cobar.client.router.rules.ibatis.IBatisNamespaceShardingRule;
+import com.alibaba.cobar.client.router.rules.ibatis.IBatisSqlActionShardingRule;
 import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 
-public class KongurIBatisNamespaceShardingRule extends AbstractKongurIBatisOrientedRule {
+/**
+ * @author zhengwei
+ */
+public class MonoIBatisSqlActionShardingRule extends AbstractMonoIBatisOrientedRule {
 
-    private transient final Logger logger = LoggerFactory.getLogger(IBatisNamespaceShardingRule.class);
+    private transient final Logger logger = LoggerFactory.getLogger(IBatisSqlActionShardingRule.class);
 
-    public KongurIBatisNamespaceShardingRule(String pattern, String action, String attributePattern) {
+    public MonoIBatisSqlActionShardingRule(String pattern, String action, String attributePattern) {
         super(pattern, action, attributePattern);
     }
 
     public boolean isDefinedAt(IBatisRoutingFact routingFact) {
         Validate.notNull(routingFact);
-        String namespace = StringUtils.substringBeforeLast(routingFact.getAction(), ".");
-        boolean matches = StringUtils.equals(namespace, getTypePattern());
+        boolean matches = StringUtils.equals(getTypePattern(), routingFact.getAction());
         if (matches) {
             try {
                 Map<String, Object> vrs = new HashMap<String, Object>();
@@ -40,12 +42,13 @@ public class KongurIBatisNamespaceShardingRule extends AbstractKongurIBatisOrien
                         getAttributePattern(), routingFact.getArgument(), t });
             }
         }
+
         return false;
     }
 
     @Override
     public String toString() {
-        return "IBatisNamespaceShardingRule [getAttributePattern()=" + getAttributePattern() + ", getAction()="
+        return "KongurIBatisSqlActionShardingRule [getAttributePattern()=" + getAttributePattern() + ", getAction()="
                + getAction() + ", getTypePattern()=" + getTypePattern() + "]";
     }
 

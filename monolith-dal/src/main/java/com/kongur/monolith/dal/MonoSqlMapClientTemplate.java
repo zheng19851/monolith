@@ -60,7 +60,7 @@ import com.ibatis.sqlmap.client.event.RowHandler;
 import com.ibatis.sqlmap.engine.impl.SqlMapClientImpl;
 import com.ibatis.sqlmap.engine.mapping.sql.Sql;
 import com.ibatis.sqlmap.engine.mapping.sql.stat.StaticSql;
-import com.kongur.monolith.dal.datasources.KongurDataSourceService;
+import com.kongur.monolith.dal.datasources.MonoDataSourceService;
 import com.kongur.monolith.dal.router.Router;
 import com.kongur.monolith.dal.router.support.RoutingResult;
 import com.kongur.monolith.dal.support.domain.Routingable;
@@ -71,9 +71,9 @@ import com.kongur.monolith.dal.support.domain.Routingable;
  * @author zhengwei
  */
 @SuppressWarnings("unchecked")
-public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements DisposableBean {
+public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements DisposableBean {
 
-    private transient Logger                     logger                          = LoggerFactory.getLogger(KongurSqlMapClientTemplate.class);
+    private transient Logger                     logger                          = LoggerFactory.getLogger(MonoSqlMapClientTemplate.class);
 
     private List<ExecutorService>                internalExecutorServiceRegistry = new ArrayList<ExecutorService>();
     /**
@@ -82,7 +82,7 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
      * CobarSqlMapClientTemplate} and {@link MultipleDataSourcesTransactionManager}.<br>
      * If a router is injected, a dataSourceLocator dependency should be injected too. <br>
      */
-    private KongurDataSourceService              kongurDataSourceService;
+    private MonoDataSourceService              kongurDataSourceService;
 
     /**
      * To enable database partitions access, an {@link ICobarRouter} is a must dependency.<br>
@@ -1306,11 +1306,11 @@ public class KongurSqlMapClientTemplate extends SqlMapClientTemplate implements 
         return defaultQueryTimeout;
     }
 
-    public KongurDataSourceService getKongurDataSourceService() {
+    public MonoDataSourceService getKongurDataSourceService() {
         return kongurDataSourceService;
     }
 
-    public void setKongurDataSourceService(KongurDataSourceService kongurDataSourceService) {
+    public void setKongurDataSourceService(MonoDataSourceService kongurDataSourceService) {
         this.kongurDataSourceService = kongurDataSourceService;
     }
 
