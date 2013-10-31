@@ -107,6 +107,11 @@ public class AttributeConfigDO {
         this.clientKey = clientKey;
     }
 
+    /**
+     *  «∑Òº”√‹
+     * 
+     * @return
+     */
     public boolean isEncrypt() {
         return encrypt;
     }

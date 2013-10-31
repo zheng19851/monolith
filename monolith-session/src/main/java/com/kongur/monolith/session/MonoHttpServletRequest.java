@@ -13,18 +13,18 @@ import javax.servlet.http.HttpSession;
 
 public class MonoHttpServletRequest extends HttpServletRequestWrapper {
 
-    private MonoHttpSession simpleSession;
+    private MonoHttpSession monoHttpSession;
 
     public MonoHttpServletRequest(HttpServletRequest request) {
         super(request);
     }
 
     public HttpSession getSession() {
-        return this.simpleSession;
+        return this.monoHttpSession;
     }
 
-    public void setSession(MonoHttpSession simpleSession) {
-        this.simpleSession = simpleSession;
+    public void setSession(MonoHttpSession monoHttpSession) {
+        this.monoHttpSession = monoHttpSession;
     }
 
 }

@@ -23,10 +23,13 @@ import com.kongur.monolith.session.attibute.DefaultAttributesConfigManager;
  * @date：2011-6-15
  */
 
-public class MonoSessionFilter implements Filter {
+public class MonoHttpSessionFilter implements Filter {
 
     private FilterConfig            filterConfig;
 
+    /**
+     * session 属性管理器
+     */
     private AttributesConfigManager attributesConfigManager;
 
     @Override
@@ -40,7 +43,14 @@ public class MonoSessionFilter implements Filter {
      * 初始化AttributesConfigManager
      */
     private void initAttributesConfigManager() {
-        attributesConfigManager = getAttributesConfigManager();
+
+        if (attributesConfigManager == null) {
+            DefaultAttributesConfigManager defaultAttributesConfigManager = new DefaultAttributesConfigManager();
+            defaultAttributesConfigManager.init();
+
+            attributesConfigManager = defaultAttributesConfigManager;
+        }
+
     }
 
     @Override
@@ -57,45 +67,38 @@ public class MonoSessionFilter implements Filter {
         // 防止重入.
         request.setAttribute(getClass().getName(), Boolean.TRUE);
 
-        MonoHttpServletRequest monoRequest = null;
-        MonoHttpServletResponse monoResponse = null;
-        MonoHttpSession session = null;
-        monoRequest = new MonoHttpServletRequest((HttpServletRequest) request);
-        monoResponse = new MonoHttpServletResponse((HttpServletResponse) response);
-        session = createMonoHttpSession(monoRequest, monoResponse);
+        MonoHttpServletRequest monoRequest = new MonoHttpServletRequest((HttpServletRequest) request);
+        MonoHttpServletResponse monoResponse = new MonoHttpServletResponse((HttpServletResponse) response);
+        MonoHttpSession session = createMonoHttpSession(monoRequest, monoResponse);
         monoRequest.setSession(session);
         monoResponse.setSession(session);
 
         try {
             chain.doFilter(monoRequest, monoResponse);
             if (session != null) {
-                session.commit(); // 默认是先将数据写进缓存
+                session.commit(); // 将修改过的cookie添加到response里
             }
         } finally {
-            
-            // 真正的写cookie到流里
+
+            // 将缓存数据写进response流里
             monoResponse.commitBuffer();
         }
     }
 
-    private MonoHttpSession createMonoHttpSession(MonoHttpServletRequest simpleRequest,
-                                              MonoHttpServletResponse simpleResponse) {
-        List<SessionAttributeStore> stores = getStores();
-        MonoHttpSession session = new MonoHttpSession(simpleRequest, simpleResponse, filterConfig.getServletContext(),
-                                                  stores, attributesConfigManager);
-        session.init();
-        return session;
-    }
-
     /**
-     * 获取AttributesConfigManager
+     * 创建session
      * 
+     * @param monoRequest
+     * @param monoResponse
      * @return
      */
-    private AttributesConfigManager getAttributesConfigManager() {
-        DefaultAttributesConfigManager attributesConfigManager = new DefaultAttributesConfigManager();
-        attributesConfigManager.init();
-        return attributesConfigManager;
+    private MonoHttpSession createMonoHttpSession(MonoHttpServletRequest monoRequest,
+                                                  MonoHttpServletResponse monoResponse) {
+        List<SessionAttributeStore> stores = getStores();
+        MonoHttpSession session = new MonoHttpSession(monoRequest, monoResponse, filterConfig.getServletContext(),
+                                                      stores, attributesConfigManager);
+        session.init();
+        return session;
     }
 
     /**
@@ -112,8 +115,11 @@ public class MonoSessionFilter implements Filter {
 
     @Override
     public void destroy() {
-        // TODO Auto-generated method stub
 
+    }
+
+    public void setAttributesConfigManager(AttributesConfigManager attributesConfigManager) {
+        this.attributesConfigManager = attributesConfigManager;
     }
 
 }

@@ -150,13 +150,13 @@ public class MonoHttpSession implements HttpSession {
 
     /**
      * 
-     * @param name 内部属性名
+     * @param attrName 内部属性名
      * 
      * @param callback
      * @return
      */
-    private Object processAttribute(String name, Callback callback) {
-        AttributeConfigDO attributeConfigDO = getAttributeConfigDO(name);
+    private Object processAttribute(String attrName, Callback callback) {
+        AttributeConfigDO attributeConfigDO = getAttributeConfigDO(attrName);
         if (attributeConfigDO == null) {
             return null;
         }
@@ -240,7 +240,8 @@ public class MonoHttpSession implements HttpSession {
      */
     public void commit() {
         try {
-            for (SessionAttributeStore store : storesMap.values()) {
+            
+            for (SessionAttributeStore store : stores) {
                 store.commit();
             }
         } catch (Exception e) {

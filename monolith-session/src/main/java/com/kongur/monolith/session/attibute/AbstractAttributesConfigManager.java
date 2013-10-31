@@ -18,4 +18,8 @@ public abstract class AbstractAttributesConfigManager implements AttributesConfi
         return attributeConfigs;
     }
 
+    public void setAttributeConfigs(Map<String, AttributeConfigDO> attributeConfigs) {
+        this.attributeConfigs = attributeConfigs;
+    }
+
 }

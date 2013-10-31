@@ -205,7 +205,7 @@ public class CookieSessionAttributeStore implements SessionAttributeStore {
             // XXX 总是编码，与原实现不同，原实现在组合cookie时只对加密的属性编码
             value = URLEncoder.encode(value, "UTF-8");
         } catch (Exception e) {
-            log.error("编码失败", e);
+            log.error("编码失败, value=" + value, e);
             // 编码失败时，返回错误标记，且不保存到cookies中
             return ERROR;
         }

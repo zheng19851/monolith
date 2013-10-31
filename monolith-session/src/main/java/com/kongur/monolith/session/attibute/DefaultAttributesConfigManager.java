@@ -1,9 +1,6 @@
 package com.kongur.monolith.session.attibute;
 
 import java.util.Collection;
-
-import com.kongur.monolith.session.CookieSessionAttributeStore;
-import com.kongur.monolith.session.MonoHttpSession;
 ;
 
 /**
@@ -34,10 +31,11 @@ public class DefaultAttributesConfigManager extends AbstractAttributesConfigMana
      */
     public void init() {
         // 可以从XML文件里读取
-        attributeConfigs.put(MonoHttpSession.SESSION_ID, new AttributeConfigDO(MonoHttpSession.SESSION_ID, "cookie1", true,CookieSessionAttributeStore.class.getSimpleName()));
-        attributeConfigs.put("name", new AttributeConfigDO("name", "cookie2", true, "CookieSessionStore"));
-        attributeConfigs.put("login", new AttributeConfigDO("login", "cookie3", true, "CookieSessionStore"));
-        attributeConfigs.put("prems", new AttributeConfigDO("prems", "cookie14", true, "CookieSessionStore"));
+        // attributeConfigs.put(MonoHttpSession.SESSION_ID, new AttributeConfigDO(MonoHttpSession.SESSION_ID, "cookie1",
+        // true,CookieSessionAttributeStore.class.getSimpleName()));
+        // attributeConfigs.put("name", new AttributeConfigDO("name", "cookie2", true, "CookieSessionStore"));
+        // attributeConfigs.put("login", new AttributeConfigDO("login", "cookie3", true, "CookieSessionStore"));
+        // attributeConfigs.put("prems", new AttributeConfigDO("prems", "cookie14", true, "CookieSessionStore"));
     }
 
 }
