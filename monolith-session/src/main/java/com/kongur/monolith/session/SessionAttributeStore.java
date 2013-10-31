@@ -15,19 +15,17 @@ public interface SessionAttributeStore extends Lifecycle {
     /**
      * 获取属性值
      * 
-     * @param configEntry
-     * @param properties
+     * @param attribute
      * @return
      */
     public Object getAttribute(AttributeConfigDO attribute);
 
-    /**
-     * 设置属性值
-     * 
-     * @param configEntry
-     * @param properties
-     * @param value 为null时表示删除
-     */
+   /**
+    * 设置属性值
+    * 
+    * @param attribute
+    * @param value
+    */
     public void setAttribute(AttributeConfigDO attribute, Object value);
 
     /**

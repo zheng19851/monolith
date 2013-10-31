@@ -1,5 +1,9 @@
 package com.kongur.monolith.session.attibute;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.kongur.monolith.session.CookieSessionAttributeStore;
+
 /**
  * cookie配置信息
  * 
@@ -15,7 +19,7 @@ public class AttributeConfigDO {
     private String  key;
 
     /**
-     * 保存时使用的名字，譬如cookie的名字
+     * 保存到客户端时使用的名字
      */
     private String  clientKey;
 
@@ -25,9 +29,9 @@ public class AttributeConfigDO {
     private boolean encrypt    = true;
 
     /**
-     * 用哪种类型的store存储
+     * 用哪种类型的store存储, 默认是CookieSessionAttributeStore
      */
-    private String  storeKey;
+    private String  storeKey   = CookieSessionAttributeStore.class.getSimpleName();
 
     /**
      * 存储的生命周期，即失效时间
@@ -158,6 +162,11 @@ public class AttributeConfigDO {
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 
 }

@@ -78,12 +78,12 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
      */
     public MonoHttpSession(MonoHttpServletRequest monoRequest, MonoHttpServletResponse monoResponse,
                            ServletContext servletContext, List<SessionAttributeStore> stores,
-                           AttributesConfigManager attributesConfig) {
+                           AttributesConfigManager attributesConfigManager) {
         this.request = monoRequest;
         this.response = monoResponse;
         this.servletContext = servletContext;
         this.stores = stores;
-        this.attributesConfigManager = attributesConfig;
+        this.attributesConfigManager = attributesConfigManager;
         this.creationTime = System.currentTimeMillis();
     }
 
@@ -157,8 +157,19 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
         if (attributeConfigDO == null) {
             return null;
         }
-        SessionAttributeStore store = storesMap.get(attributeConfigDO.getStoreKey());
+
+        SessionAttributeStore store = resolveStore(attributeConfigDO);
         return callback.doCallback(store, attributeConfigDO);
+    }
+
+    /**
+     * ¾ö¶¨store
+     * 
+     * @param attrConfig
+     * @return
+     */
+    private SessionAttributeStore resolveStore(AttributeConfigDO attrConfig) {
+        return storesMap.get(attrConfig.getStoreKey());
     }
 
     /**
@@ -321,6 +332,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     @Override
     public void destroy() {
+
     }
 
 }
