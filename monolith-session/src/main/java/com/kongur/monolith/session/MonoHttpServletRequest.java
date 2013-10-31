@@ -5,7 +5,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
 /**
- * mono request
+ * 
+ * mono request ½ö½öÖØÐ´getSession
  * 
  * @author zhengwei
  * @date£º2011-6-15

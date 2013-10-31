@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import com.kongur.monolith.session.attibute.AttributeConfigDO;
 import com.kongur.monolith.session.attibute.AttributeDO;
@@ -23,9 +22,7 @@ import com.kongur.monolith.session.util.BlowfishUtils;
  * @date：2011-6-15
  */
 
-public class CookieSessionAttributeStore implements SessionAttributeStore {
-
-    private static final Logger      log       = Logger.getLogger(CookieSessionAttributeStore.class);
+public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
 
     /**
      * 存放已解析的属性
@@ -41,8 +38,6 @@ public class CookieSessionAttributeStore implements SessionAttributeStore {
      * 标记修改过的属性
      */
     private Set<String>              dirty;
-
-    private MonoHttpSession          monoHttpSession;
 
     /**
      * 用于标记编码失败
@@ -202,7 +197,6 @@ public class CookieSessionAttributeStore implements SessionAttributeStore {
         }
 
         try {
-            // XXX 总是编码，与原实现不同，原实现在组合cookie时只对加密的属性编码
             value = URLEncoder.encode(value, "UTF-8");
         } catch (Exception e) {
             log.error("编码失败, value=" + value, e);

@@ -20,51 +20,50 @@ import com.kongur.monolith.session.attibute.AttributesConfigManager;
 import com.kongur.monolith.session.util.UniqID;
 
 /**
- * 
  * mono http session 实现
  * 
  * @author zhengwei
  * @date：2011-6-15
  */
 
-public class MonoHttpSession implements HttpSession {
+public class MonoHttpSession implements HttpSession, Lifecycle {
 
-    private static final Logger                   log                 = Logger.getLogger(MonoHttpSession.class);
+    private static final Logger                log                 = Logger.getLogger(MonoHttpSession.class);
 
-    public static final String                    SESSION_ID          = "sessionID";
+    public static final String                 SESSION_ID          = "sessionID";
 
     /**
      * 
      */
-    private  MonoHttpServletRequest  request;
+    private MonoHttpServletRequest             request;
 
-    private  MonoHttpServletResponse response;
+    private MonoHttpServletResponse            response;
 
-    private  ServletContext               servletContext;
+    private ServletContext                     servletContext;
 
-    private  String                       sessionId;
+    private String                             sessionId;
 
     /**
      * session 创建时间
      */
-    private  long                         creationTime;
+    private long                               creationTime;
 
     /**
      * session失效时间，默认半个小时,单位：秒
      */
-    private  int                          maxInactiveInterval = 1800;                                 
+    private int                                maxInactiveInterval = 1800;
 
     /**
      * 所有SessionAttributeStore
      */
-    private List<SessionAttributeStore>                    stores;
+    private List<SessionAttributeStore>        stores;
 
-    private Map<String, SessionAttributeStore>             storesMap;
+    private Map<String, SessionAttributeStore> storesMap;
 
     /**
      * 属性信息管理
      */
-    private AttributesConfigManager               attributesConfigManager;
+    private AttributesConfigManager            attributesConfigManager;
 
     public MonoHttpSession() {
 
@@ -78,8 +77,8 @@ public class MonoHttpSession implements HttpSession {
      * @param attributesConfig，属性配置信息
      */
     public MonoHttpSession(MonoHttpServletRequest monoRequest, MonoHttpServletResponse monoResponse,
-                         ServletContext servletContext, List<SessionAttributeStore> stores,
-                         AttributesConfigManager attributesConfig) {
+                           ServletContext servletContext, List<SessionAttributeStore> stores,
+                           AttributesConfigManager attributesConfig) {
         this.request = monoRequest;
         this.response = monoResponse;
         this.servletContext = servletContext;
@@ -149,9 +148,7 @@ public class MonoHttpSession implements HttpSession {
     }
 
     /**
-     * 
      * @param attrName 内部属性名
-     * 
      * @param callback
      * @return
      */
@@ -163,11 +160,6 @@ public class MonoHttpSession implements HttpSession {
         SessionAttributeStore store = storesMap.get(attributeConfigDO.getStoreKey());
         return callback.doCallback(store, attributeConfigDO);
     }
-
-    // private SessionStore getStore(String name) {
-    // AttributeConfigDO attributeConfigDO = getAttributeConfigDO(name);
-    // return storesMap.get(attributeConfigDO.getStoreKey());
-    // }
 
     /**
      * 根据属性名称获取配置信息
@@ -240,7 +232,7 @@ public class MonoHttpSession implements HttpSession {
      */
     public void commit() {
         try {
-            
+
             for (SessionAttributeStore store : stores) {
                 store.commit();
             }
@@ -281,41 +273,45 @@ public class MonoHttpSession implements HttpSession {
         this.servletContext = servletContext;
     }
 
+    /**
+     * 初始化session
+     */
     public void init() {
 
-        initStoresMap();
+        initStores();
 
-        setSessionToStores();
-        fetchSessionId();
+        initSessionId();
 
     }
 
-    private void initStoresMap() {
+    /**
+     * 初始化stores
+     */
+    private void initStores() {
         if (stores != null) {
-            storesMap = new HashMap<String, SessionAttributeStore>();
+            storesMap = new HashMap<String, SessionAttributeStore>(stores.size());
             for (SessionAttributeStore store : stores) {
+                store.init();
+                store.init(this);
                 storesMap.put(store.getClass().getSimpleName(), store);
             }
         }
+
     }
 
-    private void setSessionToStores() {
-        for (SessionAttributeStore store : storesMap.values()) {
-            store.init(this);
-        }
-    }
+    /**
+     * 初始化session id
+     */
+    private void initSessionId() {
 
-    private void fetchSessionId() {
-        
         sessionId = (String) getAttribute(SESSION_ID);
-        
+
         // sessionid 校验
         if (StringUtils.isBlank(sessionId)) {
             sessionId = DigestUtils.md5Hex(UniqID.getInstance().getUniqID());
             setAttribute(SESSION_ID, sessionId);
         }
 
-       
     }
 
     private interface Callback {
@@ -323,9 +319,8 @@ public class MonoHttpSession implements HttpSession {
         Object doCallback(SessionAttributeStore store, AttributeConfigDO ac);
     }
 
-    public static void main(String[] args) {
-        MonoHttpSession ss = new MonoHttpSession();
-        System.out.println(ss.getClass().getSimpleName());
+    @Override
+    public void destroy() {
     }
 
 }

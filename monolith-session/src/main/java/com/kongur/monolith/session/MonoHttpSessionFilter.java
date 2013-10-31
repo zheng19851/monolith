@@ -19,7 +19,7 @@ import com.kongur.monolith.session.attibute.DefaultAttributesConfigManager;
 /**
  * monolith session filter
  * 
- * @author zhengwei
+ * @author wade.zheng
  * @date£º2011-6-15
  */
 
@@ -108,8 +108,8 @@ public class MonoHttpSessionFilter implements Filter {
      */
     private List<SessionAttributeStore> getStores() {
         List<SessionAttributeStore> stores = new ArrayList<SessionAttributeStore>();
-
-        stores.add(new CookieSessionAttributeStore());
+        CookieSessionAttributeStore cookieStore = new CookieSessionAttributeStore();
+        stores.add(cookieStore);
         return stores;
     }
 

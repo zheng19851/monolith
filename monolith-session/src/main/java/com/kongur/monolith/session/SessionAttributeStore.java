@@ -10,7 +10,7 @@ import com.kongur.monolith.session.attibute.AttributeConfigDO;
  * @date：2011-6-15
  */
 
-public interface SessionAttributeStore {
+public interface SessionAttributeStore extends Lifecycle {
 
     /**
      * 获取属性值
