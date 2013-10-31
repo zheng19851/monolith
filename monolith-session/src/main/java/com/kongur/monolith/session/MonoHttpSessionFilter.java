@@ -12,6 +12,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.kongur.monolith.session.attibute.AttributesConfigManager;
 import com.kongur.monolith.session.attibute.DefaultAttributesConfigManager;
@@ -25,8 +26,6 @@ import com.kongur.monolith.session.attibute.DefaultAttributesConfigManager;
 
 public class MonoHttpSessionFilter implements Filter {
 
-    private FilterConfig            filterConfig;
-
     /**
      * session 属性管理器
      */
@@ -34,7 +33,6 @@ public class MonoHttpSessionFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        this.filterConfig = filterConfig;
 
         initAttributesConfigManager();
     }
@@ -67,9 +65,11 @@ public class MonoHttpSessionFilter implements Filter {
         // 防止重入.
         request.setAttribute(getClass().getName(), Boolean.TRUE);
 
-        MonoHttpServletRequest monoRequest = new MonoHttpServletRequest((HttpServletRequest) request);
+        HttpServletRequest httpReq = (HttpServletRequest) request;
+        MonoHttpServletRequest monoRequest = new MonoHttpServletRequest(httpReq);
         MonoHttpServletResponse monoResponse = new MonoHttpServletResponse((HttpServletResponse) response);
-        MonoHttpSession session = createMonoHttpSession(monoRequest, monoResponse);
+
+        MonoHttpSession session = createMonoHttpSession(monoRequest, monoResponse, httpReq.getSession());
         monoRequest.setSession(session);
         monoResponse.setSession(session);
 
@@ -91,13 +91,14 @@ public class MonoHttpSessionFilter implements Filter {
      * 
      * @param monoRequest
      * @param monoResponse
+     * @param httpSession
      * @return
      */
     private MonoHttpSession createMonoHttpSession(MonoHttpServletRequest monoRequest,
-                                                  MonoHttpServletResponse monoResponse) {
+                                                  MonoHttpServletResponse monoResponse, HttpSession httpSession) {
         List<SessionAttributeStore> stores = getStores();
-        MonoHttpSession session = new MonoHttpSession(monoRequest, monoResponse, filterConfig.getServletContext(),
-                                                      stores, attributesConfigManager);
+        MonoHttpSession session = new MonoHttpSession(monoRequest, monoResponse, httpSession, stores,
+                                                      attributesConfigManager);
         session.init();
         return session;
     }

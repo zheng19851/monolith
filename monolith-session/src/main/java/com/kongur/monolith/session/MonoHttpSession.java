@@ -39,7 +39,10 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     private MonoHttpServletResponse            response;
 
-    private ServletContext                     servletContext;
+    /**
+     * servlet 容器创建的session
+     */
+    private HttpSession                        srcHttpSession;
 
     private String                             sessionId;
 
@@ -77,12 +80,12 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
      * @param attributesConfig，属性配置信息
      */
     public MonoHttpSession(MonoHttpServletRequest monoRequest, MonoHttpServletResponse monoResponse,
-                           ServletContext servletContext, List<SessionAttributeStore> stores,
+                           HttpSession httpSession, List<SessionAttributeStore> stores,
                            AttributesConfigManager attributesConfigManager) {
         this.request = monoRequest;
         this.response = monoResponse;
-        this.servletContext = servletContext;
         this.stores = stores;
+        this.srcHttpSession = httpSession;
         this.attributesConfigManager = attributesConfigManager;
         this.creationTime = System.currentTimeMillis();
     }
@@ -104,7 +107,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     @Override
     public ServletContext getServletContext() {
-        return servletContext;
+        return srcHttpSession.getServletContext();
     }
 
     @Override
@@ -278,10 +281,6 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     public List<SessionAttributeStore> getStores() {
         return stores;
-    }
-
-    public void setServletContext(ServletContext servletContext) {
-        this.servletContext = servletContext;
     }
 
     /**
