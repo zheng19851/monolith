@@ -8,7 +8,7 @@
            
 	<context:component-scan base-package="com.kongur.monolith.biz" />
 	
-	<bean id="attributesConfigManager" class="com.kongur.monolith.session.attibute.DefaultAttributesConfigManager">
+	<bean id="attributesConfigManager" class="com.kongur.monolith.session.attibute.DefaultAttributesConfigManager" init-method="init">
 	    <property name="attributeConfigs">
 	        <map>
 	            <entry key="username">
