@@ -1,4 +1,4 @@
-package com.kongur.monolith.session.util;
+package com.kongur.monolith.common;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,7 +11,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
- * @author zhengwei
  * @date£º2011-6-15
  */
 
