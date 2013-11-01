@@ -30,7 +30,6 @@
 		</init-param>
 	</filter>	
 	
-	<!-- 
 	<servlet>
 		<servlet-name>springServlet</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -40,11 +39,10 @@
 		</init-param>
 		<load-on-startup>2</load-on-startup>
 	</servlet>
-	  -->
 	
 	<filter-mapping>
 	    <filter-name>monoHttpSessionFilter</filter-name>
-	    <url-pattern>*.html</url-pattern>
+	    <url-pattern>*.htm</url-pattern>
 	</filter-mapping>
 	 
 	<servlet>
@@ -53,16 +51,15 @@
 	</servlet>
 	
 	<servlet-mapping>
-		<servlet-name>monoServlet</servlet-name>
-		<url-pattern>*.html</url-pattern>
-	</servlet-mapping>
-	
-	<!-- 
-	<servlet-mapping>
 		<servlet-name>springServlet</servlet-name>
 		<url-pattern>*.htm</url-pattern>
 	</servlet-mapping>
-	 -->
+	
+	<servlet-mapping>
+		<servlet-name>monoServlet</servlet-name>
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+	
 	 
 	<welcome-file-list>
 		<welcome-file>index.htm</welcome-file>

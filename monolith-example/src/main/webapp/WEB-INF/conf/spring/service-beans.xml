@@ -17,13 +17,6 @@
 	                    <property name="clientKey" value="username11"></property>
 	                </bean>
 	            </entry>
-	            
-	            <entry key="sessionID">
-	                <bean class="com.kongur.monolith.session.attibute.AttributeConfigDO">
-	                    <property name="key" value="sessionID"></property>
-	                    <property name="clientKey" value="sessionID11"></property>
-	                </bean>
-	            </entry>
 	        </map>
 	    </property>
 	</bean>

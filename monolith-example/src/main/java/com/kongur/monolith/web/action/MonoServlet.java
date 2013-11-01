@@ -2,14 +2,13 @@ package com.kongur.monolith.web.action;
 
 import java.io.IOException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-
-import com.kongur.monolith.session.MonoHttpSession;
 
 public class MonoServlet extends HttpServlet {
 
@@ -24,12 +23,14 @@ public class MonoServlet extends HttpServlet {
 
         System.out.println("in doget");
 
+        // use internal attribute name
         String username = (String) req.getSession().getAttribute("username");
 
-        String sessionId = (String) req.getSession().getAttribute(MonoHttpSession.SESSION_ID);
-        
+        // fetch sesssionId
+        String sessionId = (String) req.getSession().getId();
+
         System.out.println("sessionId=" + sessionId);
-        
+
         if (StringUtils.isBlank(username)) {
             System.out.println("no username");
             req.getSession().setAttribute("username", "zhangsan");
@@ -37,7 +38,9 @@ public class MonoServlet extends HttpServlet {
             System.out.println("username=" + username);
         }
 
-        super.doGet(req, resp);
+        RequestDispatcher rd = req.getRequestDispatcher("/index.html");
+
+        rd.forward(req, resp);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class MonoServlet extends HttpServlet {
 
         System.out.println("in doPost");
 
-        super.doPost(req, resp);
+        this.doGet(req, resp);
     }
 
 }

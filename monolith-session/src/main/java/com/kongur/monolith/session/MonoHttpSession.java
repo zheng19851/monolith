@@ -11,13 +11,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.kongur.monolith.session.attibute.AttributeConfigDO;
 import com.kongur.monolith.session.attibute.AttributesConfigManager;
-import com.kongur.monolith.session.util.UniqID;
 
 /**
  * mono http session 实现
@@ -30,8 +27,6 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     private static final Logger                log                 = Logger.getLogger(MonoHttpSession.class);
 
-    public static final String                 SESSION_ID          = "sessionID";
-
     /**
      * 
      */
@@ -43,8 +38,6 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
      * servlet 容器创建的session
      */
     private HttpSession                        srcHttpSession;
-
-    private String                             sessionId;
 
     /**
      * session 创建时间
@@ -97,7 +90,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     @Override
     public String getId() {
-        return this.sessionId;
+        return this.srcHttpSession.getId();
     }
 
     @Override
@@ -272,11 +265,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     }
 
     public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+        return this.srcHttpSession.getId();
     }
 
     public List<SessionAttributeStore> getStores() {
@@ -289,8 +278,6 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     public void init() {
 
         initStores();
-
-        initSessionId();
 
     }
 
@@ -305,21 +292,6 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
                 store.init(this);
                 storesMap.put(store.getClass().getSimpleName(), store);
             }
-        }
-
-    }
-
-    /**
-     * 初始化session id
-     */
-    private void initSessionId() {
-
-        sessionId = (String) getAttribute(SESSION_ID);
-
-        // sessionid 校验
-        if (StringUtils.isBlank(sessionId)) {
-            sessionId = DigestUtils.md5Hex(UniqID.getInstance().getUniqID());
-            setAttribute(SESSION_ID, sessionId);
         }
 
     }
