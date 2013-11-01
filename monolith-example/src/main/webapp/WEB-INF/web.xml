@@ -42,7 +42,7 @@
 	
 	<filter-mapping>
 	    <filter-name>monoHttpSessionFilter</filter-name>
-	    <url-pattern>*.htm</url-pattern>
+	    <url-pattern>*.html</url-pattern>
 	</filter-mapping>
 	 
 	<servlet>
@@ -52,7 +52,7 @@
 	
 	<servlet-mapping>
 		<servlet-name>springServlet</servlet-name>
-		<url-pattern>*.htm</url-pattern>
+		<url-pattern>*.html</url-pattern>
 	</servlet-mapping>
 	
 	<servlet-mapping>
