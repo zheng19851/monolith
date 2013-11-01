@@ -11,9 +11,9 @@ import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.kongur.monolith.common.BlowfishUtils;
 import com.kongur.monolith.session.attibute.AttributeConfigDO;
 import com.kongur.monolith.session.attibute.AttributeDO;
-import com.kongur.monolith.session.util.BlowfishUtils;
 
 /**
  * 用cookie实现的session store
