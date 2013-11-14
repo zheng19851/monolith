@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * 支持邮件模板缓存
  * 
@@ -15,6 +17,10 @@ public abstract class AbstractCachingMailTemplateResolver implements MailTemplat
 
     @Override
     public MailTemplate resolveTemplate(String template, Locale locale) {
+
+        if (StringUtils.isBlank(template)) {
+            throw new RuntimeException("template can not be blank!");
+        }
 
         Object cacheKey = getCacheKey(template, locale);
 
@@ -31,10 +37,10 @@ public abstract class AbstractCachingMailTemplateResolver implements MailTemplat
     }
 
     protected Object getCacheKey(String template, Locale locale) {
-        if(locale == null) {
+        if (locale == null) {
             return template;
         }
-        
+
         return template + "_" + locale;
     }
 

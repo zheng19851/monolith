@@ -12,27 +12,27 @@ public interface MailSendService {
      * 
      * @param mail
      */
-    void synSend(MailDO mail) throws MailException;
+    SendResult send(MailDO mail) throws SendMailException;
 
     /**
      * 同步发送多封邮件
      * 
      * @param mails
      */
-    void synSend(MailDO[] mails) throws MailException;
+    SendResult send(MailDO[] mails) throws SendMailException;
 
     /**
      * 异步发送单封邮件
      * 
      * @param mail
      */
-    void asynSend(MailDO mail) throws MailException;
+    SendResult asynSend(MailDO mail) throws SendMailException;
 
     /**
      * 异步发送多封邮件
      * 
      * @param mails
      */
-    void asynSend(MailDO[] mails) throws MailException;
+    SendResult asynSend(MailDO[] mails) throws SendMailException;
 
 }

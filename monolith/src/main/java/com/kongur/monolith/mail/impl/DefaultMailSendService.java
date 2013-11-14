@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 
 import com.kongur.monolith.mail.AbstractMailSendService;
 import com.kongur.monolith.mail.MailDO;
+import com.kongur.monolith.mail.SendResult;
 
 /**
  * 默认的邮件发送实现
@@ -19,7 +20,7 @@ public class DefaultMailSendService extends AbstractMailSendService {
     private JavaMailSender javaMailSender;
 
     @Override
-    protected void doSend(MailDO mail) throws Exception {
+    protected void doSend(MailDO mail, SendResult result) throws Exception {
 
         javaMailSender.send(createMimeMessage(mail));
 

@@ -3,35 +3,76 @@ package com.kongur.monolith.mail;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
  * @author zhengwei
  */
 public abstract class AbstractMailSendService implements MailSendService {
-    
-    protected final Logger logger = Logger.getLogger(getClass());
 
-    private static final Executor DEFAULT_EXECUTOR = Executors.newSingleThreadExecutor();
+    protected final Logger       logger          = Logger.getLogger(getClass());
 
-    private Executor              executor         = DEFAULT_EXECUTOR;
+    /**
+     * 异步执行器
+     */
+    private Executor             executor;
 
     /**
      * 创建邮件模板
      */
-    private MailTemplateResolver  mailTemplateResolver;
+    private MailTemplateResolver mailTemplateResolver;
+
+    /**
+     * 默认的邮件发送者
+     */
+    private String               defaultMailFrom;
+
+    /**
+     * 是否禁止发送邮件，默认不禁止
+     */
+    private boolean              disableSendMail = false;
+
+    /**
+     * 初始化
+     */
+    public void init() {
+        if (this.executor == null) {
+            this.executor = Executors.newSingleThreadExecutor();
+        }
+
+        if (StringUtils.isBlank(this.defaultMailFrom)) {
+            throw new RuntimeException("the defaultMailFrom can not be blank!");
+        }
+
+    }
 
     @Override
-    public void synSend(MailDO mail) throws MailException {
+    public SendResult send(MailDO mail) throws SendMailException {
+
+        SendResult result = new SendResult(true);
+        if (disableSendMail) {
+            return result;
+        }
+
+        if (StringUtils.isBlank(mail.getFrom())) {
+            mail.setFrom(this.defaultMailFrom);
+        }
 
         try {
 
-            renderContent(mail);
+            renderContent(mail, result);
 
-            doSend(mail);
+            if (!result.isSuccess()) {
+                return result;
+            }
+
+            doSend(mail, result);
         } catch (Exception e) {
-            throw new MailException(e);
+            throw new SendMailException(e);
         }
+
+        return result;
     }
 
     /**
@@ -39,53 +80,88 @@ public abstract class AbstractMailSendService implements MailSendService {
      * 
      * @param mail
      */
-    protected void renderContent(MailDO mail) {
-        // 创建邮件模板
-        MailTemplate mailTemplate = mailTemplateResolver.resolveTemplate(mail.getTemplate(), mail.getLocale());
+    protected void renderContent(MailDO mail, SendResult result) {
 
-        String content = mailTemplate.render(mail.getParams());
-
-        mail.setContent(content);
-    }
-
-    @Override
-    public void synSend(final MailDO[] mails) throws MailException {
-        for (MailDO mail : mails) {
-            synSend(mail);
+        if (StringUtils.isBlank(mail.getTemplate()) && StringUtils.isBlank(mail.getContent())) {
+            throw new SendMailException("The MailDO's template or content can not be blank!");
         }
+
+        if (StringUtils.isNotBlank(mail.getTemplate())) {
+            // 创建邮件模板
+            MailTemplate mailTemplate = mailTemplateResolver.resolveTemplate(mail.getTemplate(), mail.getLocale());
+
+            String content = mailTemplate.render(mail.getParams());
+
+            mail.setContent(content);
+
+        }
+
     }
 
     @Override
-    public void asynSend(final MailDO mail) throws MailException {
+    public SendResult send(final MailDO[] mails) throws SendMailException {
+        SendResult result = new SendResult(true);
 
-        renderContent(mail);
-        
+        if (disableSendMail) {
+            return result;
+        }
+
+        for (MailDO mail : mails) {
+            result = send(mail);
+            if (!result.isSuccess()) {
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public SendResult asynSend(final MailDO mail) throws SendMailException {
+        final SendResult result = new SendResult(true);
+
+        if (disableSendMail) {
+            return result;
+        }
+
         executor.execute(new Runnable() {
 
             @Override
             public void run() {
-                try {
-                    doSend(mail);
-                } catch (Exception e) {
-                    logger.error(e);
-                }
+                send(mail);
             }
         });
+
+        return result;
     }
 
     @Override
-    public void asynSend(MailDO[] mails) throws MailException {
-        for (MailDO mail : mails) {
-            asynSend(mail);
+    public SendResult asynSend(final MailDO[] mails) throws SendMailException {
+
+        SendResult result = new SendResult(true);
+
+        if (disableSendMail) {
+            return result;
         }
+
+        executor.execute(new Runnable() {
+
+            @Override
+            public void run() {
+                send(mails);
+            }
+        });
+
+        return result;
     }
 
     /**
      * sub class to impl
      * 
      * @param mail
+     * @param result
      */
-    protected abstract void doSend(MailDO mail) throws Exception;
+    protected abstract void doSend(MailDO mail, SendResult result) throws Exception;
 
     public Executor getExecutor() {
         return executor;
@@ -101,6 +177,22 @@ public abstract class AbstractMailSendService implements MailSendService {
 
     public void setMailTemplateResolver(MailTemplateResolver mailTemplateResolver) {
         this.mailTemplateResolver = mailTemplateResolver;
+    }
+
+    public void setDisableSendMail(boolean disableSendMail) {
+        this.disableSendMail = disableSendMail;
+    }
+
+    public boolean isDisableSendMail() {
+        return disableSendMail;
+    }
+
+    public String getDefaultMailFrom() {
+        return defaultMailFrom;
+    }
+
+    public void setDefaultMailFrom(String defaultMailFrom) {
+        this.defaultMailFrom = defaultMailFrom;
     }
 
 }

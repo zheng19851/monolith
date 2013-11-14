@@ -53,11 +53,15 @@ public class MailDO implements Serializable {
     private boolean             html;
 
     /**
-     * 内容, 通过template来生成
+     * 内容, 可通过template来生成，如果外部设置了content, 那么不会通过template来生成内容
      */
     private String              content;
 
     private Locale              locale;
+
+    public MailDO(String to, String subject, String template) {
+        this(null, to, subject, template);
+    }
 
     public MailDO(String from, String to, String subject, String template) {
         this.from = from;
