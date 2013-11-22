@@ -1,9 +1,10 @@
 package com.kongur.monolith.mail;
 
+
 import com.kongur.monolith.common.result.Result;
 
 /**
- * ·¢ËÍÓÊ¼þ½á¹û
+ * ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
  * 
  * @author zhengwei
  *
@@ -21,5 +22,6 @@ public class SendResult extends Result {
      * 
      */
     private static final long serialVersionUID = -2721975115652157379L;
+
 
 }

@@ -1,22 +1,24 @@
 package com.kongur.monolith.mail;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 /**
+ * 邮件发送服务
+ *
  * @author zhengwei
  */
 public abstract class AbstractMailSendService implements MailSendService {
 
-    protected final Logger       logger          = Logger.getLogger(getClass());
+    protected final Logger logger = Logger.getLogger(getClass());
 
     /**
      * 异步执行器
      */
-    private Executor             executor;
+    private Executor executor;
 
     /**
      * 创建邮件模板
@@ -26,12 +28,12 @@ public abstract class AbstractMailSendService implements MailSendService {
     /**
      * 默认的邮件发送者
      */
-    private String               defaultMailFrom;
+    private String defaultMailFrom;
 
     /**
      * 是否禁止发送邮件，默认不禁止
      */
-    private boolean              disableSendMail = false;
+    private boolean disableSendMail = false;
 
     /**
      * 初始化
@@ -50,34 +52,12 @@ public abstract class AbstractMailSendService implements MailSendService {
     @Override
     public SendResult send(MailDO mail) throws SendMailException {
 
-        SendResult result = new SendResult(true);
-        if (disableSendMail) {
-            return result;
-        }
-
-        if (StringUtils.isBlank(mail.getFrom())) {
-            mail.setFrom(this.defaultMailFrom);
-        }
-
-        try {
-
-            renderContent(mail, result);
-
-            if (!result.isSuccess()) {
-                return result;
-            }
-
-            doSend(mail, result);
-        } catch (Exception e) {
-            throw new SendMailException(e);
-        }
-
-        return result;
+        return send(new MailDO[]{mail});
     }
 
     /**
      * 生成邮件内容
-     * 
+     *
      * @param mail
      */
     protected void renderContent(MailDO mail, SendResult result) {
@@ -107,7 +87,7 @@ public abstract class AbstractMailSendService implements MailSendService {
         }
 
         for (MailDO mail : mails) {
-            result = send(mail);
+            sendInternal(mail, result);
             if (!result.isSuccess()) {
                 return result;
             }
@@ -116,23 +96,36 @@ public abstract class AbstractMailSendService implements MailSendService {
         return result;
     }
 
-    @Override
-    public SendResult asynSend(final MailDO mail) throws SendMailException {
-        final SendResult result = new SendResult(true);
-
-        if (disableSendMail) {
-            return result;
+    private void sendInternal(MailDO mail, SendResult result) {
+        if (StringUtils.isBlank(mail.getFrom())) {
+            mail.setFrom(this.defaultMailFrom);
         }
 
-        executor.execute(new Runnable() {
+        try {
 
-            @Override
-            public void run() {
-                send(mail);
+            renderContent(mail, result);
+
+            if (!result.isSuccess()) {
+                logger.error("send mail error, resultInfo=" + result.getResultInfo() + ", MailDO=" + mail);
+                return;
             }
-        });
 
-        return result;
+            doSend(mail, result);
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("send mail success.MailDO=" + mail);
+            }
+
+        } catch (Exception e) {
+            logger.error("send mail error, MailDO=" + mail, e);
+            throw new SendMailException(e);
+        }
+
+    }
+
+    @Override
+    public SendResult asynSend(final MailDO mail) throws SendMailException {
+        return asynSend(new MailDO[]{mail});
     }
 
     @Override
@@ -148,7 +141,11 @@ public abstract class AbstractMailSendService implements MailSendService {
 
             @Override
             public void run() {
-                send(mails);
+                try {
+                    send(mails);
+                } catch (Exception e) {
+                    logger.error("send mail error", e);
+                }
             }
         });
 
@@ -157,7 +154,7 @@ public abstract class AbstractMailSendService implements MailSendService {
 
     /**
      * sub class to impl
-     * 
+     *
      * @param mail
      * @param result
      */
