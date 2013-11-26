@@ -2,7 +2,7 @@ package com.kongur.monolith.session.attibute;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.kongur.monolith.session.CookieSessionAttributeStore;
+import com.kongur.monolith.session.store.CookieSessionAttributeStore;
 
 /**
  * cookie≈‰÷√–≈œ¢

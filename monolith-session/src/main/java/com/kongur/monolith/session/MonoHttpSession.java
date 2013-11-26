@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 
 import com.kongur.monolith.session.attibute.AttributeConfigDO;
 import com.kongur.monolith.session.attibute.AttributesConfigManager;
+import com.kongur.monolith.session.store.SessionAttributeStore;
 
 /**
  * mono http session й╣ож

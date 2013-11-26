@@ -1,4 +1,4 @@
-package com.kongur.monolith.session;
+package com.kongur.monolith.session.store;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -12,6 +12,10 @@ import javax.servlet.http.Cookie;
 import org.apache.commons.lang.StringUtils;
 
 import com.kongur.monolith.common.BlowfishUtils;
+import com.kongur.monolith.session.MonoCookie;
+import com.kongur.monolith.session.MonoHttpServletRequest;
+import com.kongur.monolith.session.MonoHttpServletResponse;
+import com.kongur.monolith.session.MonoHttpSession;
 import com.kongur.monolith.session.attibute.AttributeConfigDO;
 import com.kongur.monolith.session.attibute.AttributeDO;
 
@@ -133,9 +137,12 @@ public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
      * @param attribute
      */
     private void encodeAttribute(AttributeDO attribute) {
-        String value = attribute != null ? attribute.getValue() : StringUtils.EMPTY;
 
-        value = encodeValue(value, attribute.getAttributeConfigDO());
+        if (attribute == null) {
+            return;
+        }
+
+        String value = encodeValue(attribute.getValue(), attribute.getAttributeConfigDO());
 
         if (value == ERROR) {
             return;
@@ -155,7 +162,7 @@ public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
         String name = ac.getClientKey();
         String domain = ac.getDomain();
         // XXX 删除cookie时将maxAge设为0，但原来的实现只是将值设为空而已
-        int maxAge = !removed ? ac.getLifeCycle() : 0;
+        int maxAge = (removed || value == null) ? 0 : ac.getLifeCycle();
         String path = ac.getCookiePath();
         boolean httpOnly = ac.isHttpOnly();
         addCookieToResponse(name, value, domain, maxAge, path, httpOnly);

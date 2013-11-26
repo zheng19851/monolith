@@ -3,6 +3,8 @@ package com.kongur.monolith.session;
 import javax.servlet.http.Cookie;
 
 /**
+ * mono cookie
+ * 
  * @author zhengwei
  * @date£º2011-6-15
  */

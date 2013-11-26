@@ -1,6 +1,8 @@
-package com.kongur.monolith.session;
+package com.kongur.monolith.session.store;
 
 import org.apache.log4j.Logger;
+
+import com.kongur.monolith.session.MonoHttpSession;
 
 /**
  * @author zhengwei

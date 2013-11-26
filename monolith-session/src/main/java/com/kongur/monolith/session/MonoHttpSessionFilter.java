@@ -16,6 +16,8 @@ import javax.servlet.http.HttpSession;
 
 import com.kongur.monolith.session.attibute.AttributesConfigManager;
 import com.kongur.monolith.session.attibute.DefaultAttributesConfigManager;
+import com.kongur.monolith.session.store.CookieSessionAttributeStore;
+import com.kongur.monolith.session.store.SessionAttributeStore;
 
 /**
  * monolith session filter

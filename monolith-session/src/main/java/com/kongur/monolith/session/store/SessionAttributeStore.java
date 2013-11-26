@@ -1,7 +1,8 @@
-package com.kongur.monolith.session;
+package com.kongur.monolith.session.store;
 
+import com.kongur.monolith.session.Lifecycle;
+import com.kongur.monolith.session.MonoHttpSession;
 import com.kongur.monolith.session.attibute.AttributeConfigDO;
-
 
 /**
  * session数据存储
@@ -20,12 +21,12 @@ public interface SessionAttributeStore extends Lifecycle {
      */
     public Object getAttribute(AttributeConfigDO attribute);
 
-   /**
-    * 设置属性值
-    * 
-    * @param attribute
-    * @param value
-    */
+    /**
+     * 设置属性值
+     * 
+     * @param attribute
+     * @param value
+     */
     public void setAttribute(AttributeConfigDO attribute, Object value);
 
     /**
@@ -39,6 +40,5 @@ public interface SessionAttributeStore extends Lifecycle {
      * @param session
      */
     public void init(MonoHttpSession session);
-
 
 }

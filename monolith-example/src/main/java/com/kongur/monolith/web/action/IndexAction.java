@@ -9,12 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class IndexAction {
-    
-    @RequestMapping("index.html")
+
+    @RequestMapping("index.htm")
     public String index(HttpServletRequest req, HttpServletResponse res, HttpSession session) {
-        
-        
+
         return "index";
     }
-    
+
 }
