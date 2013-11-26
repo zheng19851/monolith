@@ -37,6 +37,13 @@
 			<param-name>attributesConfigManager</param-name>
 			<param-value>com.kongur.monolith.session.attibute.DefaultAttributesConfigManager</param-value>
 		</init-param>
+		<init-param>
+			<param-name>sessionStores</param-name>
+			<param-value>
+			    com.kongur.monolith.session.store.CookieSessionAttributeStore,
+				com.kongur.monolith.session.store.MemorySessionAttributeStore
+			</param-value>
+		</init-param>
 	</filter>	
 	 -->
 	 

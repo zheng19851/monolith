@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import com.kongur.monolith.session.attibute.AttributesConfigManager;
 import com.kongur.monolith.session.attibute.DefaultAttributesConfigManager;
@@ -31,39 +32,86 @@ import com.kongur.monolith.session.store.SessionAttributeStore;
 
 public class MonoHttpSessionFilter implements Filter {
 
+    private static final Logger         log                             = Logger.getLogger(MonoHttpSessionFilter.class);
+
     /**
      * session 属性管理器
      */
-    private AttributesConfigManager attributesConfigManager;
+    private AttributesConfigManager     attributesConfigManager;
 
-    private static final String     ATTRIBUTES_CONFIG_MANAGER_CLASS = "attributesConfigManager";
+    /**
+     * SessionAttributeStore
+     */
+    private List<SessionAttributeStore> stores;
+
+    private static final String         ATTRIBUTES_CONFIG_MANAGER_CLASS = "attributesConfigManager";
+
+    private static final String         SESSION_STORES                  = "sessionStores";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
-        initAttributesConfigManager(filterConfig);
+        loadAttributesConfigManager(filterConfig);
+
+        loadSessionStores(filterConfig);
     }
 
-    /**
-     * 初始化AttributesConfigManager
-     * 
-     * @param filterConfig
-     * @throws ServletException
-     */
-    private void initAttributesConfigManager(FilterConfig filterConfig) throws ServletException {
+    private void loadSessionStores(FilterConfig filterConfig) throws ServletException {
+        if (filterConfig == null) {
+            return;
+        }
 
-        if (filterConfig != null) {
-            String attributesConfigManagerClazz = filterConfig.getInitParameter(ATTRIBUTES_CONFIG_MANAGER_CLASS);
+        // 设置sessionStores
+        String sessionStores = filterConfig.getInitParameter(SESSION_STORES);
+        if (StringUtils.isNotBlank(sessionStores)) {
+            String[] sessionStoresArr = null;
+            if (sessionStores.contains(",")) {
+                sessionStoresArr = sessionStores.split(",");
+            } else {
+                sessionStoresArr = new String[] { sessionStores };
+            }
 
-            if (!StringUtils.isBlank(attributesConfigManagerClazz)) {
+            if (stores == null) {
+                this.stores = new ArrayList<SessionAttributeStore>(sessionStoresArr.length);
+            }
+
+            for (String storeClazz : sessionStoresArr) {
                 try {
-                    Class clazz = ClassUtils.getClass(attributesConfigManagerClazz);
-                    attributesConfigManager = (AttributesConfigManager) clazz.newInstance();
+                    Class clazz = ClassUtils.getClass(storeClazz);
+                    SessionAttributeStore store = (SessionAttributeStore) clazz.newInstance();
+                    if (this.stores.contains(store)) {
+                        throw new RuntimeException("duplicate SessionAttributeStore, class of (" + storeClazz + ")");
+                    }
+                    this.stores.add(store);
                 } catch (Exception e) {
                     throw new ServletException(e);
                 }
             }
 
+        }
+
+        if (this.stores == null) {
+            this.stores = new ArrayList<SessionAttributeStore>(1);
+            this.stores.add(new CookieSessionAttributeStore());
+        }
+
+    }
+
+    private void loadAttributesConfigManager(FilterConfig filterConfig) throws ServletException {
+        if (filterConfig == null) {
+            return;
+        }
+
+        // 设置attributesConfigManager
+        String attributesConfigManagerClazz = filterConfig.getInitParameter(ATTRIBUTES_CONFIG_MANAGER_CLASS);
+
+        if (StringUtils.isNotBlank(attributesConfigManagerClazz)) {
+            try {
+                Class clazz = ClassUtils.getClass(attributesConfigManagerClazz);
+                attributesConfigManager = (AttributesConfigManager) clazz.newInstance();
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
         }
 
         if (attributesConfigManager == null) {
@@ -133,6 +181,11 @@ public class MonoHttpSessionFilter implements Filter {
      * @return
      */
     private List<SessionAttributeStore> getStores() {
+
+        if (this.stores != null) {
+            return this.stores;
+        }
+
         List<SessionAttributeStore> stores = new ArrayList<SessionAttributeStore>();
         CookieSessionAttributeStore cookieStore = new CookieSessionAttributeStore();
         stores.add(cookieStore);
