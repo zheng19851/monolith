@@ -14,6 +14,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang.StringUtils;
+
 import com.kongur.monolith.session.attibute.AttributesConfigManager;
 import com.kongur.monolith.session.attibute.DefaultAttributesConfigManager;
 import com.kongur.monolith.session.store.CookieSessionAttributeStore;
@@ -33,23 +36,42 @@ public class MonoHttpSessionFilter implements Filter {
      */
     private AttributesConfigManager attributesConfigManager;
 
+    private static final String     ATTRIBUTES_CONFIG_MANAGER_CLASS = "attributesConfigManager";
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
-        initAttributesConfigManager();
+        initAttributesConfigManager(filterConfig);
     }
 
     /**
      * ≥ı ºªØAttributesConfigManager
+     * 
+     * @param filterConfig
+     * @throws ServletException
      */
-    private void initAttributesConfigManager() {
+    private void initAttributesConfigManager(FilterConfig filterConfig) throws ServletException {
+
+        if (filterConfig != null) {
+            String attributesConfigManagerClazz = filterConfig.getInitParameter(ATTRIBUTES_CONFIG_MANAGER_CLASS);
+
+            if (!StringUtils.isBlank(attributesConfigManagerClazz)) {
+                try {
+                    Class clazz = ClassUtils.getClass(attributesConfigManagerClazz);
+                    attributesConfigManager = (AttributesConfigManager) clazz.newInstance();
+                } catch (Exception e) {
+                    throw new ServletException(e);
+                }
+            }
+
+        }
 
         if (attributesConfigManager == null) {
             DefaultAttributesConfigManager defaultAttributesConfigManager = new DefaultAttributesConfigManager();
-            defaultAttributesConfigManager.init();
-
             attributesConfigManager = defaultAttributesConfigManager;
         }
+
+        attributesConfigManager.init();
 
     }
 
@@ -119,7 +141,7 @@ public class MonoHttpSessionFilter implements Filter {
 
     @Override
     public void destroy() {
-
+        this.attributesConfigManager.destroy();
     }
 
     public void setAttributesConfigManager(AttributesConfigManager attributesConfigManager) {

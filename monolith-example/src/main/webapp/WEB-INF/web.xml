@@ -20,7 +20,6 @@
 		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
 	</listener>
 	
-	
 	<filter>
 		<filter-name>monoHttpSessionFilter</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -29,7 +28,18 @@
 			<param-value>monoHttpSessionFilterBean</param-value>
 		</init-param>
 	</filter>	
-	
+	 
+	<!-- 
+	 <filter>
+		<filter-name>monoHttpSessionFilter</filter-name>
+		<filter-class>com.kongur.monolith.session.MonoHttpSessionFilter</filter-class>
+		<init-param>
+			<param-name>attributesConfigManager</param-name>
+			<param-value>com.kongur.monolith.session.attibute.DefaultAttributesConfigManager</param-value>
+		</init-param>
+	</filter>	
+	 -->
+	 
 	<servlet>
 		<servlet-name>springServlet</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
