@@ -186,7 +186,7 @@ public class MonoHttpSessionFilter implements Filter {
             return this.stores;
         }
 
-        List<SessionAttributeStore> stores = new ArrayList<SessionAttributeStore>();
+        List<SessionAttributeStore> stores = new ArrayList<SessionAttributeStore>(1);
         CookieSessionAttributeStore cookieStore = new CookieSessionAttributeStore();
         stores.add(cookieStore);
         return stores;
@@ -195,6 +195,11 @@ public class MonoHttpSessionFilter implements Filter {
     @Override
     public void destroy() {
         this.attributesConfigManager.destroy();
+        if (this.stores != null && !this.stores.isEmpty()) {
+            for (SessionAttributeStore store : this.stores) {
+                store.destroy();
+            }
+        }
     }
 
     public void setAttributesConfigManager(AttributesConfigManager attributesConfigManager) {

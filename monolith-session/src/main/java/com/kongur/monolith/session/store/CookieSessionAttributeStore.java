@@ -29,6 +29,11 @@ import com.kongur.monolith.session.attibute.AttributeDO;
 public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
 
     /**
+     * session
+     */
+    private MonoHttpSession          monoHttpSession;
+
+    /**
      * 存放已解析的属性
      */
     private Map<String, AttributeDO> attributes;
@@ -161,7 +166,7 @@ public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
     private void addCookieToResponse(AttributeConfigDO ac, String value, boolean removed) {
         String name = ac.getClientKey();
         String domain = ac.getDomain();
-        // XXX 删除cookie时将maxAge设为0，但原来的实现只是将值设为空而已
+        // 删除cookie时将maxAge设为0
         int maxAge = (removed || value == null) ? 0 : ac.getLifeCycle();
         String path = ac.getCookiePath();
         boolean httpOnly = ac.isHttpOnly();
@@ -235,4 +240,5 @@ public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
         return monoHttpSession.getRequest();
     }
 
+   
 }
