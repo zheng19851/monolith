@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="monolith-common-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/monolith-common/target/monolith-common-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

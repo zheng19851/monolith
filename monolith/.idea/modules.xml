@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://D:/idea_workspace/demo/demo.iml" filepath="D:/idea_workspace/demo/demo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/monolith.iml" filepath="$PROJECT_DIR$/monolith.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../monolith-common/monolith-common.iml" filepath="$PROJECT_DIR$/../monolith-common/monolith-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../monolith-dal/monolith-dal.iml" filepath="$PROJECT_DIR$/../monolith-dal/monolith-dal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../monolith-example/monolith-example.iml" filepath="$PROJECT_DIR$/../monolith-example/monolith-example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../monolith-session/monolith-session.iml" filepath="$PROJECT_DIR$/../monolith-session/monolith-session.iml" />
+    </modules>
+  </component>
+</project>
+
