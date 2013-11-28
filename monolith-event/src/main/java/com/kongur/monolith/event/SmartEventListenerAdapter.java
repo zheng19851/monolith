@@ -3,6 +3,8 @@ package com.kongur.monolith.event;
 import org.springframework.core.GenericTypeResolver;
 
 /**
+ * 事件适配器
+ * 
  * @author zhengwei
  */
 public class SmartEventListenerAdapter<E extends Event> implements SmartEventListener<E> {
@@ -21,10 +23,10 @@ public class SmartEventListenerAdapter<E extends Event> implements SmartEventLis
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public boolean supportsEventType(Class<? extends Event> eventType) {
-        
+
         // 根据EventListener.onEvent()方法的参数来判断当前listener是否supports 该event
         Class typeArg = GenericTypeResolver.resolveTypeArgument(this.delegate.getClass(), EventListener.class);
-        
+
         return (typeArg == null || typeArg.isAssignableFrom(eventType));
     }
 

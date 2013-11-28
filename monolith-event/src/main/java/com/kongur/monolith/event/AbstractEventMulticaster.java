@@ -33,7 +33,7 @@ public abstract class AbstractEventMulticaster<E extends Event> implements Event
     @Override
     public void addListener(EventListener<E> listener) {
         synchronized (this.defaultRetriever) {
-            this.defaultRetriever.applicationListeners.add(listener);
+            this.defaultRetriever.eventListeners.add(listener);
             this.listenerCache.clear();
         }
     }
@@ -41,7 +41,7 @@ public abstract class AbstractEventMulticaster<E extends Event> implements Event
     @Override
     public void removeListener(EventListener<E> listener) {
         synchronized (this.defaultRetriever) {
-            this.defaultRetriever.applicationListeners.remove(listener);
+            this.defaultRetriever.eventListeners.remove(listener);
             this.listenerCache.clear();
         }
     }
@@ -52,23 +52,23 @@ public abstract class AbstractEventMulticaster<E extends Event> implements Event
      * @param event
      * @return
      */
-    protected Collection<EventListener<E>> getSystemListeners(E event) {
+    protected Collection<EventListener<E>> getEventListeners(E event) {
 
         ListenerCacheKey cacheKey = createCacheKey(event);
 
         ListenerRetriever retriever = this.listenerCache.get(cacheKey);
 
         if (retriever != null) {
-            return retriever.applicationListeners;
+            return retriever.eventListeners;
         }
 
         retriever = new ListenerRetriever();
         List<EventListener<E>> allListeners = new ArrayList<EventListener<E>>();
 
         synchronized (this.defaultRetriever) {
-            for (EventListener<E> listener : this.defaultRetriever.applicationListeners) {
+            for (EventListener<E> listener : this.defaultRetriever.eventListeners) {
                 if (supportsEvent(listener, event)) {
-                    retriever.applicationListeners.add(listener);
+                    retriever.eventListeners.add(listener);
                     allListeners.add(listener);
                 }
             }
@@ -108,14 +108,16 @@ public abstract class AbstractEventMulticaster<E extends Event> implements Event
     }
 
     /**
+     * ¼àÌıÆ÷ÊÕ¼¯Æ÷
+     * 
      * @author zhengwei
      */
     private class ListenerRetriever {
 
-        public final Set<EventListener<E>> applicationListeners;
+        public final Set<EventListener<E>> eventListeners;
 
         public ListenerRetriever() {
-            this.applicationListeners = new LinkedHashSet<EventListener<E>>();
+            this.eventListeners = new LinkedHashSet<EventListener<E>>();
         }
 
     }

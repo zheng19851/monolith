@@ -1,7 +1,7 @@
 package com.kongur.monolith.event;
 
 /**
- * 交易监听接口
+ * 监听器接口
  * 
  * @author zhengwei
  */

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import com.kongur.monolith.event.SimpleEventMulticaster;
+import com.kongur.monolith.event.DefaultEventMulticaster;
 import com.kongur.monolith.event.Event;
 import com.kongur.monolith.event.EventMulticaster;
 import com.kongur.monolith.event.EventListener;
@@ -90,7 +90,7 @@ public class EventMulticasterFactoryBean implements FactoryBean<EventMulticaster
         if (clazz == null) {
             // throw new RuntimeException("please set the property of 'clazz', type of SystemEventMulticaster");
             logger.warn("the property of clazz has not be setted, the default value will be setted[SimpleSystemEventMulticaster.class]!");
-            clazz = SimpleEventMulticaster.class;
+            clazz = DefaultEventMulticaster.class;
         }
 
         systemEventMulticaster = (EventMulticaster<Event>) clazz.newInstance();
