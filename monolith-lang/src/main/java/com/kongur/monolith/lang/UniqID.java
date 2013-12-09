@@ -1,4 +1,4 @@
-package com.kongur.monolith.common;
+package com.kongur.monolith.lang;
 
 import java.io.IOException;
 import java.net.InetAddress;

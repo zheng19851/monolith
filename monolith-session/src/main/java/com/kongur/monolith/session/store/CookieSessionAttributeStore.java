@@ -11,7 +11,7 @@ import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
 
-import com.kongur.monolith.common.BlowfishUtils;
+import com.kongur.monolith.lang.BlowfishUtils;
 import com.kongur.monolith.session.MonoCookie;
 import com.kongur.monolith.session.MonoHttpServletRequest;
 import com.kongur.monolith.session.MonoHttpServletResponse;

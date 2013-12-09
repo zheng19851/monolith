@@ -1,4 +1,4 @@
-package com.kongur.monolith.common;
+package com.kongur.monolith.lang;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
