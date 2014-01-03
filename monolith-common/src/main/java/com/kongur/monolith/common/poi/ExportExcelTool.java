@@ -2,6 +2,7 @@ package com.kongur.monolith.common.poi;
 
 import java.io.OutputStream;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,6 +20,24 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 public class ExportExcelTool {
 
     private static final Logger log = Logger.getLogger(ExportExcelTool.class);
+
+    /**
+     * 导出excel， 不需要传文件名称
+     * 
+     * @param fields 字段名称
+     * @param datas 数据
+     * @param response HttpServletResponse
+     * @param callback
+     * @return
+     * @throws ExportException
+     */
+    public static <T> boolean export(String[] fields, List<T> datas, HttpServletResponse response,
+                                     ExportCallback<T> callback) throws ExportException {
+
+        String fileName = UUID.randomUUID().toString();
+        return export(fileName, fields, datas, response, callback);
+
+    }
 
     /**
      * 导出excel到HttpServletResponse
