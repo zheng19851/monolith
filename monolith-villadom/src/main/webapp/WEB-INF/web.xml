@@ -1,0 +1,110 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+  
+  <context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>villadom.root</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/conf/log4j.properties</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>log4jExposeWebAppRoot</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	
+	<context-param>
+		<param-name>log4jRefreshInterval</param-name>
+		<param-value>10000</param-value>
+	</context-param>
+	
+  
+  	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			/WEB-INF/conf/spring/**/*-beans.xml
+		</param-value>
+	</context-param>
+	
+  	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+	
+  	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<listener>
+		<listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+	</listener>
+	
+	<filter>
+		<filter-name>monoHttpSessionFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>targetBeanName</param-name>
+			<param-value>monoHttpSessionFilterBean</param-value>
+		</init-param>
+	</filter>	
+	 
+	<!-- 
+	 <filter>
+		<filter-name>monoHttpSessionFilter</filter-name>
+		<filter-class>com.kongur.monolith.session.MonoHttpSessionFilter</filter-class>
+		<init-param>
+			<param-name>attributesConfigManager</param-name>
+			<param-value>com.kongur.monolith.session.attibute.DefaultAttributesConfigManager</param-value>
+		</init-param>
+		<init-param>
+			<param-name>sessionStores</param-name>
+			<param-value>
+			    com.kongur.monolith.session.store.CookieSessionAttributeStore,
+				com.kongur.monolith.session.store.MemorySessionAttributeStore
+			</param-value>
+		</init-param>
+	</filter>	
+	 -->
+	 
+	<servlet>
+		<servlet-name>springServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>WEB-INF/conf/spring/web/web-main.xml</param-value>
+		</init-param>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<filter-mapping>
+	    <filter-name>monoHttpSessionFilter</filter-name>
+	    <url-pattern>*.htm</url-pattern>
+	</filter-mapping>
+	 
+	
+	<servlet-mapping>
+		<servlet-name>springServlet</servlet-name>
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+	
+	<welcome-file-list>
+		<welcome-file>index.htm</welcome-file>
+	</welcome-file-list>
+	
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error.htm</location>
+	</error-page>
+	
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error.htm</location>
+	</error-page>
+	
+</web-app>

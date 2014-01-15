@@ -13,11 +13,11 @@ import org.springframework.context.ApplicationContextAware;
 
 import com.kongur.monolith.event.DefaultEventMulticaster;
 import com.kongur.monolith.event.Event;
-import com.kongur.monolith.event.EventMulticaster;
 import com.kongur.monolith.event.EventListener;
+import com.kongur.monolith.event.EventMulticaster;
 
 /**
- * 创建SystemEventMulticaster
+ * 创建EventMulticaster
  * 
  * @author zhengwei
  */
@@ -26,11 +26,14 @@ public class EventMulticasterFactoryBean implements FactoryBean<EventMulticaster
     private final Logger                        logger      = Logger.getLogger(getClass());
 
     /**
-     * 具体的SystemEventMulticaster实例类型
+     * 具体的EventMulticaster实例类型
      */
     private Class<?>                            clazz;
 
-    private EventMulticaster<Event> systemEventMulticaster;
+    /**
+     * 事件传播器
+     */
+    private EventMulticaster<Event> eventMulticaster;
 
     /**
      * 配置的监听器
@@ -38,7 +41,7 @@ public class EventMulticasterFactoryBean implements FactoryBean<EventMulticaster
     private List<EventListener<Event>>   listeners;
 
     /**
-     * 是否自动收集监听器，如果为true, 那么会从容器中自动获取类型为SystemListener的所有监听器，并注册到SystemEventMulticaster里面，默认为true
+     * 是否自动收集监听器，如果为true, 那么会从容器中自动获取类型为EventListener的所有监听器，并注册到EventMulticaster里面，默认为true
      */
     private boolean                             autoCollect = true;
 
@@ -46,7 +49,7 @@ public class EventMulticasterFactoryBean implements FactoryBean<EventMulticaster
 
     @Override
     public EventMulticaster<Event> getObject() throws Exception {
-        return systemEventMulticaster;
+        return eventMulticaster;
     }
 
     @Override
@@ -89,15 +92,15 @@ public class EventMulticasterFactoryBean implements FactoryBean<EventMulticaster
     public void afterPropertiesSet() throws Exception {
         if (clazz == null) {
             // throw new RuntimeException("please set the property of 'clazz', type of SystemEventMulticaster");
-            logger.warn("the property of clazz has not be setted, the default value will be setted[SimpleSystemEventMulticaster.class]!");
+            logger.warn("the property of clazz has not be setted, the default value will be setted[DefaultEventMulticaster.class]!");
             clazz = DefaultEventMulticaster.class;
         }
 
-        systemEventMulticaster = (EventMulticaster<Event>) clazz.newInstance();
+        eventMulticaster = (EventMulticaster<Event>) clazz.newInstance();
 
         if (listeners != null) {
             for (EventListener<Event> listener : listeners) {
-                systemEventMulticaster.addListener(listener);
+                eventMulticaster.addListener(listener);
             }
         }
 
@@ -110,7 +113,7 @@ public class EventMulticasterFactoryBean implements FactoryBean<EventMulticaster
 
             if (listeners != null && !listeners.isEmpty()) {
                 for (Entry<String, EventListener> entry : listeners.entrySet()) {
-                    systemEventMulticaster.addListener(entry.getValue());
+                    eventMulticaster.addListener(entry.getValue());
                 }
             }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="GB2312"?>
+<rules>
+  <rule>
+     <!-- 对应slqmap里的namespace --> 
+    <namespace>SystemUserDAO</namespace>
+    <!-- <sqlmap></sqlmap> -->
+    <!--计算数据库的路由结果 <shardingExpression>mod.apply(memberId)==1</shardingExpression> -->
+    <shards>kongur1</shards>
+    <!-- 
+    <tableResolveExp>hashing.apply(loginName, 2)</tableResolveExp>
+     -->
+  </rule>
+   <rule>
+    <namespace>TradeOrderDAO</namespace>
+    <shards>kongur1</shards>
+    <!-- 计算出表的路由结果 -->
+    <tableResolveExp>mod.apply(routingField, 4)</tableResolveExp>
+  </rule>
+
+
+  
+</rules>

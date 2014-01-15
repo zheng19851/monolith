@@ -82,7 +82,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
      * CobarSqlMapClientTemplate} and {@link MultipleDataSourcesTransactionManager}.<br>
      * If a router is injected, a dataSourceLocator dependency should be injected too. <br>
      */
-    private MonoDataSourceService              kongurDataSourceService;
+    private MonoDataSourceService              monoDataSourceService;
 
     /**
      * To enable database partitions access, an {@link ICobarRouter} is a must dependency.<br>
@@ -326,7 +326,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
                     DataSource targetDataSource = null;
                     if (MapUtils.isEmpty(resultDataSources)) {
-                        targetDataSource = getKongurDataSourceService().getDefaultDataSource();
+                        targetDataSource = getMonoDataSourceService().getDefaultDataSource();
                         return executeWith(targetDataSource, action);
                     } else if (resultDataSources.size() == 1) {
                         targetDataSource = resultDataSources.get(resultDataSources.firstKey());
@@ -397,7 +397,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
         // 路由不到数据源的话 ， 就取默认的
         if (resultDataSources == null || resultDataSources.isEmpty()) {
-            Integer row = (Integer) executeWith(getKongurDataSourceService().getDefaultDataSource(), callback);
+            Integer row = (Integer) executeWith(getMonoDataSourceService().getDefaultDataSource(), callback);
             if (row != null) {
                 rows = row.intValue();
             }
@@ -472,7 +472,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
     private Object batchInsertAfterReordering(final String statementName, final Object parameterObject) {
         Set<String> keys = new HashSet<String>();
         // keys.add(getDefaultDataSourceName());
-        keys.addAll(getKongurDataSourceService().getDataSources().keySet());
+        keys.addAll(getMonoDataSourceService().getDataSources().keySet());
 
         final CobarMRBase mrbase = new CobarMRBase(keys);
 
@@ -504,7 +504,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                                 logger.info("can't find routing rule for {} with parameter {}, so use default data source for it.",
                                             statementName, internalObject);
                                 // mrbase.emit(getDefaultDataSourceName(), internalObject);
-                                mrbase.emit(getKongurDataSourceService().getDefaultDataSourceDescriptor().getIdentity(),
+                                mrbase.emit(getMonoDataSourceService().getDefaultDataSourceDescriptor().getIdentity(),
                                             internalObject);
                             } else {
                                 if (dsMap.size() > 1) {
@@ -549,7 +549,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
             String identity = entity.getKey();
 
-            final DataSource dataSourceToUse = getKongurDataSourceService().getDataSource(identity);
+            final DataSource dataSourceToUse = getMonoDataSourceService().getDataSource(identity);
 
             final SqlMapClientCallback callback = new SqlMapClientCallback() {
 
@@ -1037,7 +1037,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
     protected SortedMap<String, DataSource> getDataSources(List<String> resourceIdentities) {
 
-        return getKongurDataSourceService().getDataSourses(resourceIdentities, true);
+        return getMonoDataSourceService().getDataSourses(resourceIdentities, true);
     }
 
     protected String getSqlByStatementName(String statementName, Object parameterObject) {
@@ -1193,7 +1193,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
             if (MapUtils.isEmpty(getDataSourceSpecificExecutors())) {
 
-                Set<CobarDataSourceDescriptor> dataSourceDescriptors = getKongurDataSourceService().getDataSourceDescriptors();
+                Set<CobarDataSourceDescriptor> dataSourceDescriptors = getMonoDataSourceService().getDataSourceDescriptors();
                 for (CobarDataSourceDescriptor descriptor : dataSourceDescriptors) {
                     ExecutorService executor = createExecutorForSpecificDataSource(descriptor);
                     getDataSourceSpecificExecutors().put(descriptor.getIdentity(), executor);
@@ -1259,7 +1259,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
      * if a router and a data source locator is provided, it means data access on different databases is enabled.<br>
      */
     protected boolean isPartitioningBehaviorEnabled() {
-        return ((router != null) && (getKongurDataSourceService() != null));
+        return ((router != null) && (getMonoDataSourceService() != null));
     }
 
     /**
@@ -1306,12 +1306,12 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
         return defaultQueryTimeout;
     }
 
-    public MonoDataSourceService getKongurDataSourceService() {
-        return kongurDataSourceService;
+    public MonoDataSourceService getMonoDataSourceService() {
+        return monoDataSourceService;
     }
 
-    public void setKongurDataSourceService(MonoDataSourceService kongurDataSourceService) {
-        this.kongurDataSourceService = kongurDataSourceService;
+    public void setMonoDataSourceService(MonoDataSourceService monoDataSourceService) {
+        this.monoDataSourceService = monoDataSourceService;
     }
 
     public void setProfileLongTimeRunningSql(boolean profileLongTimeRunningSql) {
