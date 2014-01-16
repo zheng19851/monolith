@@ -66,7 +66,9 @@ import com.kongur.monolith.dal.router.support.RoutingResult;
 import com.kongur.monolith.dal.support.domain.Routingable;
 
 /**
- * kongur sqlMapClientTemplate提供访问数据源策略(支持分库分表)
+ * MonoSqlMapClientTemplate 提供访问数据源策略(支持分库分表)
+ * 
+ * @see CobarSqlMapClientTemplate
  * 
  * @author zhengwei
  */
@@ -82,7 +84,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
      * CobarSqlMapClientTemplate} and {@link MultipleDataSourcesTransactionManager}.<br>
      * If a router is injected, a dataSourceLocator dependency should be injected too. <br>
      */
-    private MonoDataSourceService              monoDataSourceService;
+    private MonoDataSourceService                monoDataSourceService;
 
     /**
      * To enable database partitions access, an {@link ICobarRouter} is a must dependency.<br>
@@ -97,11 +99,6 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
      * asynchronously.
      */
     private ISqlAuditor                          sqlAuditor;
-
-    /**
-     * SQL 审核用的ExecutorService
-     */
-    private ExecutorService                      sqlAuditorExecutor;
 
     /**
      * setup ExecutorService for data access requests on each data sources.<br>
@@ -201,19 +198,17 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
             // 分库分表
             if (isPartitioningBehaviorEnabled()) {
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+                final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
                 if (!MapUtils.isEmpty(dsMap)) {
 
-                    // TODO zhengwei modified 2011-12-1
-                    SqlMapClientCallback action = new ExecuteSqlMapClientCallbackTemplate(statementName, internalObject) {
+                    SqlMapClientCallback action = new SqlMapClientCallback() {
 
                         @Override
-                        protected Object doAction(SqlMapExecutor executor, String statement, Object param)
-                                                                                                          throws SQLException {
-                            return executor.delete(statement, param);
+                        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
+                            return executor.delete(statementName, internalObject);
                         }
                     };
 
@@ -310,14 +305,13 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                     SortedMap<String, DataSource> resultDataSources = getDataSources(routingResult.getResourceIdentities());
 
                     // TODO zhengwei modified 2011-12-1
-                    Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+                    final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
-                    SqlMapClientCallback action = new ExecuteSqlMapClientCallbackTemplate(statementName, internalObject) {
+                    SqlMapClientCallback action = new SqlMapClientCallback() {
 
                         @Override
-                        protected Object doAction(SqlMapExecutor executor, String statementName, Object paramObj)
-                                                                                                                 throws SQLException {
-                            return executor.insert(statementName, paramObj);
+                        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
+                            return executor.insert(statementName, internalObject);
                         }
                     };
 
@@ -591,15 +585,23 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
             if (isPartitioningBehaviorEnabled()) {
 
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+                final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
                 if (!MapUtils.isEmpty(dsMap)) {
 
-                    // TODO zhengwei modified 2011-12-1
-                    SqlMapClientCallback callback = new InternalSqlMapClientCallback1(statementName, internalObject,
-                                                                                      skipResults, maxResults);
+                    SqlMapClientCallback callback = new SqlMapClientCallback() {
+
+                        @Override
+                        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
+                            if (skipResults != null && maxResults != null) {
+                                return executor.queryForList(statementName, internalObject, skipResults, maxResults);
+                            } else {
+                                return executor.queryForList(statementName, internalObject);
+                            }
+                        }
+                    };
 
                     if (dsMap.size() == 1) {
                         return (List) executeWith(dsMap.get(dsMap.firstKey()), callback);
@@ -745,15 +747,24 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
                 // 根据SQL ID和参数对请求进行路由
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+                final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
                 if (!MapUtils.isEmpty(dsMap)) {
 
-                    // TODO zhengwei modified 2011-12-1
-                    SqlMapClientCallback callback = new InternalSqlMapClientCallback0(statementName, internalObject,
-                                                                                      resultObject);
+                    SqlMapClientCallback callback = new SqlMapClientCallback() {
+
+                        @Override
+                        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
+
+                            if (resultObject != null) {
+                                return executor.queryForObject(statementName, internalObject, resultObject);
+                            } else {
+                                return executor.queryForObject(statementName, internalObject);
+                            }
+                        }
+                    };
 
                     if (dsMap.size() == 1) {
                         return executeWith(dsMap.get(dsMap.firstKey()), callback);
@@ -812,9 +823,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
         Object internalObject = parameterObject;
 
         if (StringUtils.isNotBlank(tableSuffix)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("resolve table suffix=" + tableSuffix);
-            }
+            logger.debug("resolve table suffix=" + tableSuffix);
 
             if (internalObject instanceof Routingable) {
                 // try {
@@ -834,9 +843,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
                 if (internalParams != null) {
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("internalParams=" + internalParams);
-                    }
+                    logger.debug("internalParams=" + internalParams);
 
                     internalParams.put(tableSuffixName, tableSuffix);
                     internalObject = internalParams;
@@ -986,19 +993,17 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
             if (isPartitioningBehaviorEnabled()) {
 
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-                Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
+                final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
                 SortedMap<String, DataSource> dsMap = getDataSources(routingResult.getResourceIdentities());
 
                 if (!MapUtils.isEmpty(dsMap)) {
 
-                    // TODO zhengwei modified 2011-12-1
-                    SqlMapClientCallback action = new ExecuteSqlMapClientCallbackTemplate(statementName, internalObject) {
+                    SqlMapClientCallback action = new SqlMapClientCallback() {
 
                         @Override
-                        protected Object doAction(SqlMapExecutor executor, String statement, Object param)
-                                                                                                          throws SQLException {
-                            return executor.update(statement, param);
+                        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
+                            return executor.update(statementName, internalObject);
                         }
                     };
 
@@ -1083,7 +1088,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                         }
                     }
                 } catch (Throwable ex) {
-                    logger.debug("Could not close JDBC Connection", ex);
+                    logger.error("Could not close JDBC Connection", ex);
                 }
             }
             // Processing finished - potentially session still to be closed.
@@ -1117,7 +1122,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
             }
         }
         setupDefaultExecutorServicesIfNecessary();
-        setUpDefaultSqlAuditorExecutorIfNecessary();
+        // setUpDefaultSqlAuditorExecutorIfNecessary();
         if (getConcurrentRequestProcessor() == null) {
             setConcurrentRequestProcessor(new DefaultConcurrentRequestProcessor(getSqlMapClient()));
         }
@@ -1149,37 +1154,37 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
         }
     }
 
-    /**
-     * if a SqlAuditor is injected and a sqlAuditorExecutor is NOT provided together, we need to setup a
-     * sqlAuditorExecutor so that the SQL auditing actions can be performed asynchronously. <br>
-     * otherwise, the data access process may be blocked by auditing SQL.<br>
-     * Although an external ExecutorService can be injected for use, normally, it's not so necessary.<br>
-     * Most of the time, you should inject an proper {@link ISqlAuditor} which will do SQL auditing in a asynchronous
-     * way.<br>
-     */
-    private void setUpDefaultSqlAuditorExecutorIfNecessary() {
-        if (sqlAuditor != null && sqlAuditorExecutor == null) {
-            sqlAuditorExecutor = createCustomExecutorService(1, "setUpDefaultSqlAuditorExecutorIfNecessary");
-            // 1. register executor for disposing later explicitly
-            internalExecutorServiceRegistry.add(sqlAuditorExecutor);
-            // 2. dispose executor implicitly
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-
-                @Override
-                public void run() {
-                    if (sqlAuditorExecutor == null) {
-                        return;
-                    }
-                    try {
-                        sqlAuditorExecutor.shutdown();
-                        sqlAuditorExecutor.awaitTermination(5, TimeUnit.MINUTES);
-                    } catch (InterruptedException e) {
-                        logger.warn("interrupted when shuting down the query executor:\n{}", e);
-                    }
-                }
-            });
-        }
-    }
+    // /**
+    // * if a SqlAuditor is injected and a sqlAuditorExecutor is NOT provided together, we need to setup a
+    // * sqlAuditorExecutor so that the SQL auditing actions can be performed asynchronously. <br>
+    // * otherwise, the data access process may be blocked by auditing SQL.<br>
+    // * Although an external ExecutorService can be injected for use, normally, it's not so necessary.<br>
+    // * Most of the time, you should inject an proper {@link ISqlAuditor} which will do SQL auditing in a asynchronous
+    // * way.<br>
+    // */
+    // private void setUpDefaultSqlAuditorExecutorIfNecessary() {
+    // if (sqlAuditor != null && sqlAuditorExecutor == null) {
+    // sqlAuditorExecutor = createCustomExecutorService(1, "setUpDefaultSqlAuditorExecutorIfNecessary");
+    // // 1. register executor for disposing later explicitly
+    // internalExecutorServiceRegistry.add(sqlAuditorExecutor);
+    // // 2. dispose executor implicitly
+    // Runtime.getRuntime().addShutdownHook(new Thread() {
+    //
+    // @Override
+    // public void run() {
+    // if (sqlAuditorExecutor == null) {
+    // return;
+    // }
+    // try {
+    // sqlAuditorExecutor.shutdown();
+    // sqlAuditorExecutor.awaitTermination(5, TimeUnit.MINUTES);
+    // } catch (InterruptedException e) {
+    // logger.warn("interrupted when shuting down the query executor:\n{}", e);
+    // }
+    // }
+    // });
+    // }
+    // }
 
     /**
      * If more than one data sources are involved in a data access request, we need a collection of executors to execute
@@ -1199,12 +1204,6 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                     getDataSourceSpecificExecutors().put(descriptor.getIdentity(), executor);
                 }
             }
-
-            // 如果存在当前默认的数据源就不需要重复加入了
-            // if (!getKongurDataSourceService().contains(getDefaultDataSourceName())) {
-            // addDefaultSingleThreadExecutorIfNecessary();
-            // }
-
         }
     }
 
@@ -1235,23 +1234,16 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
         return executor;
     }
 
-    // private void addDefaultSingleThreadExecutorIfNecessary() {
-    // String identity = getDefaultDataSourceName();
-    // CobarDataSourceDescriptor descriptor = new CobarDataSourceDescriptor();
-    // descriptor.setIdentity(identity);
-    // descriptor.setPoolSize(Runtime.getRuntime().availableProcessors() * 5);
-    // getDataSourceSpecificExecutors().put(identity, createExecutorForSpecificDataSource(descriptor));
-    // }
-
     protected void auditSqlIfNecessary(final String statementName, final Object parameterObject) {
         if (getSqlAuditor() != null) {
-            getSqlAuditorExecutor().execute(new Runnable() {
-
-                public void run() {
-                    getSqlAuditor().audit(statementName, getSqlByStatementName(statementName, parameterObject),
-                                          parameterObject);
-                }
-            });
+            getSqlAuditor().audit(statementName, getSqlByStatementName(statementName, parameterObject), parameterObject);
+            // getSqlAuditorExecutor().execute(new Runnable() {
+            //
+            // public void run() {
+            // getSqlAuditor().audit(statementName, getSqlByStatementName(statementName, parameterObject),
+            // parameterObject);
+            // }
+            // });
         }
     }
 
@@ -1277,14 +1269,6 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
     public ISqlAuditor getSqlAuditor() {
         return sqlAuditor;
-    }
-
-    public void setSqlAuditorExecutor(ExecutorService sqlAuditorExecutor) {
-        this.sqlAuditorExecutor = sqlAuditorExecutor;
-    }
-
-    public ExecutorService getSqlAuditorExecutor() {
-        return sqlAuditorExecutor;
     }
 
     public void setDataSourceSpecificExecutors(Map<String, ExecutorService> dataSourceSpecificExecutors) {
@@ -1373,86 +1357,6 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                                                                    new ThreadPoolExecutor.CallerRunsPolicy());
 
         return executor;
-    }
-
-    /**
-     * 增加、删除、修改用的模板
-     * 
-     * @author zhengwei
-     */
-    abstract class ExecuteSqlMapClientCallbackTemplate implements SqlMapClientCallback {
-
-        String statementName;
-        Object parameterObject;
-
-        ExecuteSqlMapClientCallbackTemplate(String statementName, Object parameterObject) {
-            this.statementName = statementName;
-            this.parameterObject = parameterObject;
-        }
-
-        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
-            return doAction(executor, statementName, parameterObject);
-        }
-
-        protected abstract Object doAction(SqlMapExecutor executor, String statement, Object param) throws SQLException;
-
-    }
-
-    /**
-     * @author zhengwei
-     */
-    class InternalSqlMapClientCallback1 extends InternalSqlMapClientCallback0 implements SqlMapClientCallback {
-
-        Integer skipResults;
-        Integer maxResults;
-
-        InternalSqlMapClientCallback1(String statementName, Object parameterObject, Integer skipResults,
-                                      Integer maxResults) {
-            super(statementName, parameterObject);
-            this.skipResults = skipResults;
-            this.maxResults = maxResults;
-        }
-
-        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
-            if (skipResults != null && maxResults != null) {
-                return executor.queryForList(statementName, parameterObject, skipResults, maxResults);
-            } else {
-                return executor.queryForList(statementName, parameterObject);
-            }
-        }
-
-    }
-
-    /**
-     * @author zhengwei
-     */
-    class InternalSqlMapClientCallback0 implements SqlMapClientCallback {
-
-        String statementName;
-
-        Object parameterObject;
-
-        Object returnObject;
-
-        InternalSqlMapClientCallback0(String statementName, Object parameterObject) {
-            this.statementName = statementName;
-            this.parameterObject = parameterObject;
-        }
-
-        InternalSqlMapClientCallback0(String statementName, Object parameterObject, Object returnObject) {
-            this.statementName = statementName;
-            this.parameterObject = parameterObject;
-            this.returnObject = returnObject;
-        }
-
-        public Object doInSqlMapClient(SqlMapExecutor executor) throws SQLException {
-
-            if (returnObject != null) {
-                return executor.queryForObject(statementName, parameterObject, returnObject);
-            } else {
-                return executor.queryForObject(statementName, parameterObject);
-            }
-        }
     }
 
     /**

@@ -24,7 +24,14 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
 
     private transient final Logger logger      = LoggerFactory.getLogger(DefaultRouter.class);
 
+    /**
+     * 本地缓存
+     */
     private LRUMap                 localCache;
+    
+    /**
+     * 是否打开缓存
+     */
     private boolean                enableCache = false;
 
     public DefaultRouter(boolean enableCache) {
@@ -42,6 +49,9 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
         }
     }
 
+    /**
+     * 路由规则定义
+     */
     private List<Set<IRoutingRule<IBatisRoutingFact, List<String>>>> ruleSequences = new ArrayList<Set<IRoutingRule<IBatisRoutingFact, List<String>>>>();
 
     public RoutingResult doRoute(IBatisRoutingFact routingFact) throws RoutingException {
@@ -72,16 +82,20 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
         }
 
         if (ruleToUse != null) {
-            logger.info("matched with rule:{} with fact:{}", ruleToUse, routingFact);
-            result.addResourceIdentities(ruleToUse.action());
+            if (logger.isInfoEnabled()) {
+                logger.info("matched with rule:{} with fact:{}", ruleToUse, routingFact);
+            }
+            result.addResourceIdentities(ruleToUse.action()); // set the resolved datasources
 
             AbstractMonoIBatisOrientedRule useRule = (AbstractMonoIBatisOrientedRule) ruleToUse;
 
-            // TODO zhengwei modified 2011-12-1
+            // TODO zhengwei modified 2011-12-1, resolver the table
             String tableSuffix = useRule.resolveTableSuffix(routingFact);
             result.setTableSuffix(tableSuffix);
         } else {
-            logger.info("No matched rule found for routing fact:{}", routingFact);
+            if (logger.isInfoEnabled()) {
+                logger.info("No matched rule found for routing fact:{}", routingFact);
+            }
         }
 
         if (enableCache) {

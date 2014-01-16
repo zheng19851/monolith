@@ -34,7 +34,7 @@
 	</bean>
 
 <!-- com.alibaba.cobar.client.datasources.DefaultKongurDataSourceService -->
-<bean id="cobarDataSourceService" class="com.kongur.monolith.dal.datasources.DefaultMonoDataSourceService">
+<bean id="monoDataSourceService" class="com.kongur.monolith.dal.datasources.DefaultMonoDataSourceService">
 	<property name="dataSourceDescriptors">
 		<set>
 			<bean class="com.kongur.monolith.dal.datasources.MonoDataSourceDescriptor"><!-- com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor -->
@@ -71,7 +71,7 @@
 <!-- 
 <bean id="transactionManager"
 	class="com.alibaba.cobar.client.transaction.MultipleDataSourcesTransactionManager">
-	<property name="cobarDataSourceService" ref="cobarDataSourceService" />
+	<property name="monoDataSourceService" ref="monoDataSourceService" />
 </bean>
  -->
 
@@ -145,11 +145,11 @@
 
 	<bean id="sqlMapClientTemplate" class="com.kongur.monolith.dal.MonoSqlMapClientTemplate"><!-- com.alibaba.cobar.client.KongurSqlMapClientTemplate -->
 		<property name="sqlMapClient" ref="sqlMapClient" />
-		<property name="monoDataSourceService" ref="cobarDataSourceService" />
+		<property name="monoDataSourceService" ref="monoDataSourceService" />
 		<property name="router" ref="internalRouter" />
 		<!-- ¹Ø±ÕSQL ÉóºË
 		<property name="sqlAuditor">
-			<bean class="com.alibaba.cobar.client.audit.SimpleSqlAuditor" />
+			<bean class="com.kongur.monolith.dal.sql.audit.DefaultSqlAuditor" />
 		</property>
 		 -->
 		<property name="profileLongTimeRunningSql" value="true" />
