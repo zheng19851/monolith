@@ -64,8 +64,8 @@
 			<property name="detectingSql" value="update cobarha set timeflag=CURRENT_TIMESTAMP()"/>
 		</bean>
 	</property>
-	 -->
 	 <property name="sqlMapClient" ref="sqlMapClient" />
+	 -->
 </bean>
 
 <!-- 

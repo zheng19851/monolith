@@ -5,7 +5,6 @@ import java.util.SortedMap;
 
 import javax.sql.DataSource;
 
-import com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor;
 import com.alibaba.cobar.client.datasources.ICobarDataSourceService;
 
 /**
@@ -27,7 +26,7 @@ public interface MonoDataSourceService extends ICobarDataSourceService {
      * 
      * @return
      */
-    public CobarDataSourceDescriptor getDefaultDataSourceDescriptor();
+    public MonoDataSourceDescriptor getDefaultDataSourceDescriptor();
 
     /**
      * 是否存在数据源

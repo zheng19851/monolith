@@ -14,7 +14,6 @@ import com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor;
 import com.alibaba.cobar.client.datasources.DefaultCobarDataSourceService;
 import com.alibaba.cobar.client.datasources.ha.NonHADataSourceCreator;
 import com.alibaba.cobar.client.support.utils.CollectionUtils;
-import com.ibatis.sqlmap.client.SqlMapClient;
 
 /**
  * 默认的数据源管理实现
@@ -24,21 +23,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService implements MonoDataSourceService {
 
     /**
-     * add by zhengwei 默认的数据源
+     * 默认的数据源配置
      */
-    private DataSource                defaultDataSource;
-
-    /**
-     * add by zhengwei 默认的数据源配置
-     */
-    private CobarDataSourceDescriptor defaultDataSourceDescriptor;
-
-    private SqlMapClient              sqlMapClient;
-
-    /**
-     * 默认的数据源ID
-     */
-    private String                    defaultDataSourceName = "default";
+    private MonoDataSourceDescriptor defaultDataSourceDescriptor;
 
     public void afterPropertiesSet() throws Exception {
 
@@ -51,7 +38,7 @@ public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService 
 
         for (CobarDataSourceDescriptor descriptor : getDataSourceDescriptors()) {
 
-            MonoDataSourceDescriptor kongurDescriptor = (MonoDataSourceDescriptor) descriptor;
+            MonoDataSourceDescriptor monoDescriptor = (MonoDataSourceDescriptor) descriptor;
 
             Validate.notEmpty(descriptor.getIdentity());
             Validate.notNull(descriptor.getTargetDataSource());
@@ -66,47 +53,24 @@ public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService 
             // getDataSources().put(descriptor.getIdentity(), proxyDataSource);
 
             getDataSources().put(descriptor.getIdentity(), dataSourceToUse);
-            if (kongurDescriptor.isDefaultDataSource()) {
-                defaultDataSource = dataSourceToUse;
-                defaultDataSourceDescriptor = descriptor;
+            if (monoDescriptor.isDefaultDataSource()) {
+                this.defaultDataSourceDescriptor = monoDescriptor;
             }
         }
 
-        // 将sqlmap client里的datasource 作为默认数据源
-        if (defaultDataSource == null) {
-            defaultDataSource = sqlMapClient.getDataSource();
-            String identity = getDefaultDataSourceName();
-            CobarDataSourceDescriptor descriptor = new CobarDataSourceDescriptor();
-            descriptor.setIdentity(identity);
-            descriptor.setPoolSize(Runtime.getRuntime().availableProcessors() * 5);
-            descriptor.setTargetDataSource(defaultDataSource);
-
-            defaultDataSourceDescriptor = descriptor;
-
-            getDataSources().put(identity, defaultDataSource);
-
-            getDataSourceDescriptors().add(descriptor);
-        }
-
-        // 判断是否有值
-        Assert.notNull(defaultDataSource);
-        Assert.notNull(defaultDataSourceDescriptor);
+        Assert.notNull(this.defaultDataSourceDescriptor, "Has not set the default datasource.");
 
     }
 
     public DataSource getDefaultDataSource() {
-        return defaultDataSource;
+        return this.defaultDataSourceDescriptor.getTargetDataSource();
     }
 
-    public void setDefaultDataSource(DataSource defaultDataSource) {
-        this.defaultDataSource = defaultDataSource;
+    public MonoDataSourceDescriptor getDefaultDataSourceDescriptor() {
+        return this.defaultDataSourceDescriptor;
     }
 
-    public CobarDataSourceDescriptor getDefaultDataSourceDescriptor() {
-        return defaultDataSourceDescriptor;
-    }
-
-    public void setDefaultDataSourceDescriptor(CobarDataSourceDescriptor defaultDataSourceDescriptor) {
+    public void setDefaultDataSourceDescriptor(MonoDataSourceDescriptor defaultDataSourceDescriptor) {
         this.defaultDataSourceDescriptor = defaultDataSourceDescriptor;
     }
 
@@ -121,7 +85,7 @@ public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService 
         if (CollectionUtils.isNotEmpty(dataSourceIdList)) {
 
             resultMap = new TreeMap<String, DataSource>();
-            
+
             if (sort) {
                 Collections.sort(dataSourceIdList);
             }
@@ -136,22 +100,6 @@ public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService 
 
     public DataSource getDataSource(String dataSourceId) {
         return getDataSources().get(dataSourceId);
-    }
-
-    public SqlMapClient getSqlMapClient() {
-        return sqlMapClient;
-    }
-
-    public void setSqlMapClient(SqlMapClient sqlMapClient) {
-        this.sqlMapClient = sqlMapClient;
-    }
-
-    public String getDefaultDataSourceName() {
-        return defaultDataSourceName;
-    }
-
-    public void setDefaultDataSourceName(String defaultDataSourceName) {
-        this.defaultDataSourceName = defaultDataSourceName;
     }
 
 }
