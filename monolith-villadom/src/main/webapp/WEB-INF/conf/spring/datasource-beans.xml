@@ -33,14 +33,12 @@
 		<property name="defaultAutoCommit" value="true" />
 	</bean>
 
-<!-- com.alibaba.cobar.client.datasources.DefaultKongurDataSourceService -->
-<bean id="cobarDataSourceService" class="com.kongur.monolith.dal.datasources.DefaultMonoDataSourceService">
+<bean id="monoDataSourceService" class="com.kongur.monolith.dal.datasources.DefaultMonoDataSourceService">
 	<property name="dataSourceDescriptors">
 		<set>
 			<bean class="com.kongur.monolith.dal.datasources.MonoDataSourceDescriptor"><!-- com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor -->
 				<property name="identity" value="kongur1"/>
 				<property name="targetDataSource" ref="dataSource"/>
-				<property name="defaultDataSource" value="true"/>
 				<!-- 
 				<property name="targetDetectorDataSource" ref="dataSource"/>
 				<property name="standbyDataSource" ref="dataSource"/>
@@ -65,7 +63,6 @@
 		</bean>
 	</property>
 	 -->
-	 <property name="sqlMapClient" ref="sqlMapClient" />
 </bean>
 
 <!-- 
@@ -114,7 +111,7 @@
 		</property>
 	</bean>
 	
-	<!-- 路由规则配置 com.alibaba.cobar.client.router.config.KongurRouterXmlFactoryBean-->
+	<!-- 路由规则配置-->
 <bean id="internalRouter" class="com.kongur.monolith.dal.router.config.MonoRouterXmlFactoryBean">
 	<property name="functionsMap">
 		<map>
@@ -143,9 +140,9 @@
 </bean>
 	
 
-	<bean id="sqlMapClientTemplate" class="com.kongur.monolith.dal.MonoSqlMapClientTemplate"><!-- com.alibaba.cobar.client.KongurSqlMapClientTemplate -->
+	<bean id="sqlMapClientTemplate" class="com.kongur.monolith.dal.MonoSqlMapClientTemplate">
 		<property name="sqlMapClient" ref="sqlMapClient" />
-		<property name="monoDataSourceService" ref="cobarDataSourceService" />
+		<property name="monoDataSourceService" ref="monoDataSourceService" />
 		<property name="router" ref="internalRouter" />
 		<!-- 关闭SQL 审核
 		<property name="sqlAuditor">
