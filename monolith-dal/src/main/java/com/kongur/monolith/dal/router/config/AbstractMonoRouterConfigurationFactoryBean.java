@@ -13,7 +13,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ObjectUtils;
 
-import com.alibaba.cobar.client.router.CobarClientInternalRouter;
 import com.alibaba.cobar.client.router.rules.IRoutingRule;
 import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 import com.kongur.monolith.dal.router.DefaultRouter;
@@ -41,7 +40,7 @@ public abstract class AbstractMonoRouterConfigurationFactoryBean implements Fact
 
     @SuppressWarnings("unchecked")
     public Class getObjectType() {
-        return CobarClientInternalRouter.class;
+        return DefaultRouter.class;
     }
 
     public boolean isSingleton() {

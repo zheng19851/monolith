@@ -8,18 +8,13 @@ import org.apache.commons.lang.Validate;
 import org.mvel2.MVEL;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.MapVariableResolverFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.alibaba.cobar.client.router.rules.ibatis.IBatisSqlActionShardingRule;
 import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 
 /**
  * @author zhengwei
  */
 public class MonoIBatisSqlActionShardingRule extends AbstractMonoIBatisOrientedRule {
-
-    private transient final Logger logger = LoggerFactory.getLogger(IBatisSqlActionShardingRule.class);
 
     public MonoIBatisSqlActionShardingRule(String pattern, String action, String attributePattern) {
         super(pattern, action, attributePattern);

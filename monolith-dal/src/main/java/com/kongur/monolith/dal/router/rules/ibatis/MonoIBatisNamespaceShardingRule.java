@@ -8,15 +8,10 @@ import org.apache.commons.lang.Validate;
 import org.mvel2.MVEL;
 import org.mvel2.integration.VariableResolverFactory;
 import org.mvel2.integration.impl.MapVariableResolverFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.alibaba.cobar.client.router.rules.ibatis.IBatisNamespaceShardingRule;
 import com.alibaba.cobar.client.router.support.IBatisRoutingFact;
 
 public class MonoIBatisNamespaceShardingRule extends AbstractMonoIBatisOrientedRule {
-
-    private transient final Logger logger = LoggerFactory.getLogger(IBatisNamespaceShardingRule.class);
 
     public MonoIBatisNamespaceShardingRule(String pattern, String action, String attributePattern) {
         super(pattern, action, attributePattern);

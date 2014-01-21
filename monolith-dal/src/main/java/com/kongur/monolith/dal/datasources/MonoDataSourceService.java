@@ -16,17 +16,17 @@ public interface MonoDataSourceService extends ICobarDataSourceService {
 
     /**
      * 默认的数据源
-     * 
+     * using MonoSqlMapClientTemplate's getDataSource() methed to fetch the default dataSource
      * @return
      */
-    public DataSource getDefaultDataSource();
+    // public DataSource getDefaultDataSource();
 
     /**
      * 默认的数据源配置
      * 
      * @return
      */
-    public MonoDataSourceDescriptor getDefaultDataSourceDescriptor();
+    // public MonoDataSourceDescriptor getDefaultDataSourceDescriptor();
 
     /**
      * 是否存在数据源
@@ -43,7 +43,7 @@ public interface MonoDataSourceService extends ICobarDataSourceService {
      * @return
      */
     SortedMap<String, DataSource> getDataSourses(List<String> dataSourceIdList, boolean sort);
-    
+
     /**
      * 根据数据源ID获取
      * 

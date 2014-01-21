@@ -40,8 +40,8 @@
 			<bean class="com.kongur.monolith.dal.datasources.MonoDataSourceDescriptor"><!-- com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor -->
 				<property name="identity" value="kongur1"/>
 				<property name="targetDataSource" ref="dataSource"/>
-				<property name="defaultDataSource" value="true"/>
 				<!-- 
+				<property name="isDefaultDataSource" value="true"/>
 				<property name="targetDetectorDataSource" ref="dataSource"/>
 				<property name="standbyDataSource" ref="dataSource"/>
 				<property name="standbyDetectorDataSource" ref="dataSource"/>

@@ -28,7 +28,7 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
      * 本地缓存
      */
     private LRUMap                 localCache;
-    
+
     /**
      * 是否打开缓存
      */
@@ -82,20 +82,15 @@ public class DefaultRouter implements Router<IBatisRoutingFact> {
         }
 
         if (ruleToUse != null) {
-            if (logger.isInfoEnabled()) {
-                logger.info("matched with rule:{} with fact:{}", ruleToUse, routingFact);
-            }
+            logger.info("matched with rule:{} with fact:{}", ruleToUse, routingFact);
             result.addResourceIdentities(ruleToUse.action()); // set the resolved datasources
 
             AbstractMonoIBatisOrientedRule useRule = (AbstractMonoIBatisOrientedRule) ruleToUse;
 
-            // TODO zhengwei modified 2011-12-1, resolver the table
             String tableSuffix = useRule.resolveTableSuffix(routingFact);
             result.setTableSuffix(tableSuffix);
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("No matched rule found for routing fact:{}", routingFact);
-            }
+            logger.info("No matched rule found for routing fact:{}", routingFact);
         }
 
         if (enableCache) {

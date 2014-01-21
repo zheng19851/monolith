@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.Validate;
-import org.springframework.util.Assert;
 
 import com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor;
 import com.alibaba.cobar.client.datasources.DefaultCobarDataSourceService;
@@ -22,10 +21,8 @@ import com.alibaba.cobar.client.support.utils.CollectionUtils;
  */
 public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService implements MonoDataSourceService {
 
-    /**
-     * 默认的数据源配置
-     */
-    private MonoDataSourceDescriptor defaultDataSourceDescriptor;
+    // using MonoSqlMapClientTemplate's getDataSource() methed to fetch the default dataSource
+    // private MonoDataSourceDescriptor defaultDataSourceDescriptor;
 
     public void afterPropertiesSet() throws Exception {
 
@@ -38,7 +35,7 @@ public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService 
 
         for (CobarDataSourceDescriptor descriptor : getDataSourceDescriptors()) {
 
-            MonoDataSourceDescriptor monoDescriptor = (MonoDataSourceDescriptor) descriptor;
+            // MonoDataSourceDescriptor monoDescriptor = (MonoDataSourceDescriptor) descriptor;
 
             Validate.notEmpty(descriptor.getIdentity());
             Validate.notNull(descriptor.getTargetDataSource());
@@ -53,26 +50,26 @@ public class DefaultMonoDataSourceService extends DefaultCobarDataSourceService 
             // getDataSources().put(descriptor.getIdentity(), proxyDataSource);
 
             getDataSources().put(descriptor.getIdentity(), dataSourceToUse);
-            if (monoDescriptor.isDefaultDataSource()) {
-                this.defaultDataSourceDescriptor = monoDescriptor;
-            }
+            // if (monoDescriptor.isDefaultDataSource()) {
+            // this.defaultDataSourceDescriptor = monoDescriptor;
+            // }
         }
 
-        Assert.notNull(this.defaultDataSourceDescriptor, "Has not set the default datasource.");
+        // Assert.notNull(this.defaultDataSourceDescriptor, "Has not set the default datasource.");
 
     }
 
-    public DataSource getDefaultDataSource() {
-        return this.defaultDataSourceDescriptor.getTargetDataSource();
-    }
-
-    public MonoDataSourceDescriptor getDefaultDataSourceDescriptor() {
-        return this.defaultDataSourceDescriptor;
-    }
-
-    public void setDefaultDataSourceDescriptor(MonoDataSourceDescriptor defaultDataSourceDescriptor) {
-        this.defaultDataSourceDescriptor = defaultDataSourceDescriptor;
-    }
+    // public DataSource getDefaultDataSource() {
+    // return this.defaultDataSourceDescriptor.getTargetDataSource();
+    // }
+    //
+    // public MonoDataSourceDescriptor getDefaultDataSourceDescriptor() {
+    // return this.defaultDataSourceDescriptor;
+    // }
+    //
+    // public void setDefaultDataSourceDescriptor(MonoDataSourceDescriptor defaultDataSourceDescriptor) {
+    // this.defaultDataSourceDescriptor = defaultDataSourceDescriptor;
+    // }
 
     public boolean contains(String dataSourceId) {
         return getDataSources().containsKey(dataSourceId);

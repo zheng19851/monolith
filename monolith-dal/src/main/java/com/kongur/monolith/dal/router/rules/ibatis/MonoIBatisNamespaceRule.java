@@ -22,6 +22,6 @@ public class MonoIBatisNamespaceRule extends AbstractMonoIBatisOrientedRule {
 
     @Override
     public String toString() {
-        return "KongurIBatisNamespaceRule [getAction()=" + getAction() + ", getTypePattern()=" + getTypePattern() + "]";
+        return "MonoIBatisNamespaceRule [getAction()=" + getAction() + ", getTypePattern()=" + getTypePattern() + "]";
     }
 }

@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 路由结果
+ * 
  * @author zhengwei
  */
 public class RoutingResult extends com.alibaba.cobar.client.router.support.RoutingResult {

@@ -69,13 +69,16 @@ import com.kongur.monolith.dal.support.domain.Routingable;
  * MonoSqlMapClientTemplate 提供访问数据源策略(支持分库分表)
  * 
  * @see CobarSqlMapClientTemplate
- * 
  * @author zhengwei
  */
 @SuppressWarnings("unchecked")
 public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements DisposableBean {
 
     private transient Logger                     logger                          = LoggerFactory.getLogger(MonoSqlMapClientTemplate.class);
+
+    private static final String                  DEFAULT_DATASOURCE_IDENTITY     = "_MonoSqlMapClientTemplate_default_data_source_name";
+
+    private String                               defaultDataSourceName           = DEFAULT_DATASOURCE_IDENTITY;
 
     private List<ExecutorService>                internalExecutorServiceRegistry = new ArrayList<ExecutorService>();
     /**
@@ -191,12 +194,13 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
         try {
 
-            if (parameterObject instanceof Collection) {
-                return batchDelete(statementName, (Collection) parameterObject);
-            }
-
             // 分库分表
             if (isPartitioningBehaviorEnabled()) {
+
+                if (parameterObject instanceof Collection) {
+                    return batchDelete(statementName, (Collection) parameterObject);
+                }
+
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
                 final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
@@ -226,10 +230,6 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                     }
                 }
             } // end if for partitioning status checking
-
-            if (parameterObject == null) {
-                return super.delete(statementName);
-            }
 
             return super.delete(statementName, parameterObject);
 
@@ -278,13 +278,14 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
         try {
 
-            // 批量增加
-            if (parameterObject instanceof Collection) {
-                return batchInsert(statementName, (Collection) parameterObject);
-            }
-
             // 分库分表
             if (isPartitioningBehaviorEnabled()) {
+
+                // 批量增加
+                if (parameterObject instanceof Collection) {
+                    return batchInsert(statementName, (Collection) parameterObject);
+                }
+
                 /**
                  * sometimes, client will submit batch insert request like "insert into ..values(), (), ()...", it's a
                  * rare situation, but does exist, so we will create new executor on this kind of request processing,
@@ -315,12 +316,10 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                         }
                     };
 
-                    // modified by zhengwei 默认的数据源统一从数据源管理里面取
-                    // targetDataSource = getSqlMapClient().getDataSource(); // fall back to default data source.
-
                     DataSource targetDataSource = null;
                     if (MapUtils.isEmpty(resultDataSources)) {
-                        targetDataSource = getMonoDataSourceService().getDefaultDataSource();
+                        targetDataSource = getDefaultDataSource();// fall back to default data source.
+                                                                  // getMonoDataSourceService().getDefaultDataSource();
                         return executeWith(targetDataSource, action);
                     } else if (resultDataSources.size() == 1) {
                         targetDataSource = resultDataSources.get(resultDataSources.firstKey());
@@ -332,10 +331,6 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                 }
 
             } // end if for partitioning status checking
-
-            // 不分库分表
-            // RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
-            // Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
 
             return super.insert(statementName, parameterObject);
         } finally {
@@ -391,7 +386,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
         // 路由不到数据源的话 ， 就取默认的
         if (resultDataSources == null || resultDataSources.isEmpty()) {
-            Integer row = (Integer) executeWith(getMonoDataSourceService().getDefaultDataSource(), callback);
+            Integer row = (Integer) executeWith(getDefaultDataSource(), callback);
             if (row != null) {
                 rows = row.intValue();
             }
@@ -465,7 +460,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
      */
     private Object batchInsertAfterReordering(final String statementName, final Object parameterObject) {
         Set<String> keys = new HashSet<String>();
-        // keys.add(getDefaultDataSourceName());
+        keys.add(getDefaultDataSourceName());
         keys.addAll(getMonoDataSourceService().getDataSources().keySet());
 
         final CobarMRBase mrbase = new CobarMRBase(keys);
@@ -497,9 +492,9 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
                             if (MapUtils.isEmpty(dsMap)) {
                                 logger.info("can't find routing rule for {} with parameter {}, so use default data source for it.",
                                             statementName, internalObject);
-                                // mrbase.emit(getDefaultDataSourceName(), internalObject);
-                                mrbase.emit(getMonoDataSourceService().getDefaultDataSourceDescriptor().getIdentity(),
-                                            internalObject);
+                                mrbase.emit(getDefaultDataSourceName(), internalObject);
+                                // mrbase.emit(getMonoDataSourceService().getDefaultDataSourceDescriptor().getIdentity(),
+                                // internalObject);
                             } else {
                                 if (dsMap.size() > 1) {
                                     throw new IllegalArgumentException(
@@ -945,11 +940,7 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
             } // end if for partitioning status checking
 
             // 不分库分表
-            if (parameterObject == null) {
-                super.queryWithRowHandler(statementName, rowHandler);
-            } else {
-                super.queryWithRowHandler(statementName, parameterObject, rowHandler);
-            }
+            super.queryWithRowHandler(statementName, parameterObject, rowHandler);
 
         } finally {
             if (isProfileLongTimeRunningSql()) {
@@ -985,12 +976,12 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
         try {
 
-            if (parameterObject instanceof Collection) {
-                return batchUpdate(statementName, (Collection) parameterObject);
-            }
-
             // 分库分表
             if (isPartitioningBehaviorEnabled()) {
+
+                if (parameterObject instanceof Collection) {
+                    return batchUpdate(statementName, (Collection) parameterObject);
+                }
 
                 RoutingResult routingResult = getRouter().doRoute(new IBatisRoutingFact(statementName, parameterObject));
                 final Object internalObject = convert2InternalParamObject(parameterObject, routingResult);
@@ -1153,38 +1144,6 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
             logger.info("all of the executor services in CobarSqlMapClientTemplate are disposed.");
         }
     }
-
-    // /**
-    // * if a SqlAuditor is injected and a sqlAuditorExecutor is NOT provided together, we need to setup a
-    // * sqlAuditorExecutor so that the SQL auditing actions can be performed asynchronously. <br>
-    // * otherwise, the data access process may be blocked by auditing SQL.<br>
-    // * Although an external ExecutorService can be injected for use, normally, it's not so necessary.<br>
-    // * Most of the time, you should inject an proper {@link ISqlAuditor} which will do SQL auditing in a asynchronous
-    // * way.<br>
-    // */
-    // private void setUpDefaultSqlAuditorExecutorIfNecessary() {
-    // if (sqlAuditor != null && sqlAuditorExecutor == null) {
-    // sqlAuditorExecutor = createCustomExecutorService(1, "setUpDefaultSqlAuditorExecutorIfNecessary");
-    // // 1. register executor for disposing later explicitly
-    // internalExecutorServiceRegistry.add(sqlAuditorExecutor);
-    // // 2. dispose executor implicitly
-    // Runtime.getRuntime().addShutdownHook(new Thread() {
-    //
-    // @Override
-    // public void run() {
-    // if (sqlAuditorExecutor == null) {
-    // return;
-    // }
-    // try {
-    // sqlAuditorExecutor.shutdown();
-    // sqlAuditorExecutor.awaitTermination(5, TimeUnit.MINUTES);
-    // } catch (InterruptedException e) {
-    // logger.warn("interrupted when shuting down the query executor:\n{}", e);
-    // }
-    // }
-    // });
-    // }
-    // }
 
     /**
      * If more than one data sources are involved in a data access request, we need a collection of executors to execute
@@ -1397,6 +1356,18 @@ public class MonoSqlMapClientTemplate extends SqlMapClientTemplate implements Di
 
     public void setTableSuffixName(String tableSuffixName) {
         this.tableSuffixName = tableSuffixName;
+    }
+
+    public DataSource getDefaultDataSource() {
+        return getDataSource();
+    }
+
+    public String getDefaultDataSourceName() {
+        return defaultDataSourceName;
+    }
+
+    public void setDefaultDataSourceName(String defaultDataSourceName) {
+        this.defaultDataSourceName = defaultDataSourceName;
     }
 
 }
