@@ -43,6 +43,9 @@ public abstract class AbstractProtocolDecoder extends ProtocolDecoderAdapter {
             ProtocolParser parser = (ProtocolParser) session.getAttribute(ATTRIBUTE_KEY);
             if (parser == null) {
                 parser = createProtocolParser(this.messageCodecFactory);
+
+                session.setAttribute(ATTRIBUTE_KEY, parser);
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("decode->create ProtocolParser for :" + session);
                 }
@@ -51,13 +54,9 @@ public abstract class AbstractProtocolDecoder extends ProtocolDecoderAdapter {
             UpstreamMessage uso = parser.parse(buffer.buf());
 
             if (uso != null) {
+                // 说明读完整了
                 output.write(uso);
-                parser = null;
                 session.removeAttribute(ATTRIBUTE_KEY);
-            } else {
-
-                // 没有读取完整就将数据放到session里，下次继续读取
-                session.setAttribute(ATTRIBUTE_KEY, parser);
             }
 
         }
