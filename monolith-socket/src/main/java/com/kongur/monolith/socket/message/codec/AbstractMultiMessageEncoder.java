@@ -9,7 +9,7 @@ import com.kongur.monolith.socket.Constants;
 import com.kongur.monolith.socket.message.DownstreamMessageSet;
 
 /**
- * 编码循环体部分
+ * 当报文体为多条数据时使用
  * 
  * @author zhengwei
  * @param <DSO>
@@ -17,8 +17,8 @@ import com.kongur.monolith.socket.message.DownstreamMessageSet;
 public abstract class AbstractMultiMessageEncoder<DSO> extends AbstractMessageEncoder<DownstreamMessageSet<DSO>> {
 
     @Override
-    protected ByteBuffer encodeMultiBuf(DownstreamMessageSet<DSO> dsoSet, CharsetEncoder encoder)
-                                                                                                 throws CharacterCodingException {
+    protected ByteBuffer doEncode(DownstreamMessageSet<DSO> dsoSet, CharsetEncoder encoder)
+                                                                                           throws CharacterCodingException {
 
         List<DSO> downstreamMessageList = dsoSet.getDownstreamMessageList();
         if (downstreamMessageList.isEmpty()) {
@@ -53,14 +53,5 @@ public abstract class AbstractMultiMessageEncoder<DSO> extends AbstractMessageEn
      * @param encoder
      */
     protected abstract void encodeOne(DSO dso, ByteBuffer entryBuf, CharsetEncoder encoder);
-
-    @Override
-    protected ByteBuffer encodeFixedBuf(DownstreamMessageSet<DSO> dsoSet, CharsetEncoder encoder, EncodeResult result)
-                                                                                                                      throws CharacterCodingException {
-        // ignore
-
-        return null;
-
-    }
 
 }

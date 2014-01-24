@@ -23,34 +23,39 @@ public abstract class AbstractMultiMessageDecoder<USO> extends AbstractMessageDe
     }
 
     @Override
-    protected void doDecodeMultiBuf(UpstreamMessageSet<USO> usoSet, ByteBuffer multiBuffer, CharsetDecoder decoder,
-                                    DecodeResult<UpstreamMessageSet<USO>> result) throws CharacterCodingException {
+    protected void doDecode(UpstreamMessageSet<USO> usoSet, ByteBuffer bodyBuf, CharsetDecoder decoder,
+                            DecodeResult<UpstreamMessageSet<USO>> result) throws CodecException {
 
-        String dataStr = CodecUtils.getString(multiBuffer, false);
+        try {
+            String dataStr = CodecUtils.getString(bodyBuf, false);
 
-        if (StringUtil.isEmpty(dataStr)) {
-            return;
-        }
-
-        String[] lines = dataStr.split(getNewBreak(), -1);
-
-        for (String line : lines) {
-            if (StringUtils.isBlank(line)) {
-                continue;
-            }
-
-            String[] fields = line.split(getSplitChar(), -1);
-
-            USO uso = createOneUpStreamObject();
-
-            doDecodeOne(uso, fields, result);
-
-            if (!result.isSuccess()) {
+            if (StringUtil.isEmpty(dataStr)) {
                 return;
             }
 
-            usoSet.addUpstreamMessage(uso);
+            String[] lines = dataStr.split(getNewBreak(), -1);
+
+            for (String line : lines) {
+                if (StringUtils.isBlank(line)) {
+                    continue;
+                }
+
+                String[] fields = line.split(getSplitChar(), -1);
+
+                USO uso = createOneUpStreamObject();
+
+                doDecodeOne(uso, fields, result);
+
+                if (!result.isSuccess()) {
+                    return;
+                }
+
+                usoSet.addUpstreamMessage(uso);
+            }
+        } catch (Exception e) {
+            throw new CodecException(e);
         }
+
     }
 
     protected abstract USO createOneUpStreamObject();
@@ -63,11 +68,5 @@ public abstract class AbstractMultiMessageDecoder<USO> extends AbstractMessageDe
      */
     protected abstract void doDecodeOne(USO uso, String[] fields, DecodeResult<UpstreamMessageSet<USO>> result)
                                                                                                                throws CharacterCodingException;
-
-    @Override
-    protected void doDecodeFixedBuf(UpstreamMessageSet<USO> usoSet, ByteBuffer fixBuffer, CharsetDecoder decoder,
-                                    DecodeResult<UpstreamMessageSet<USO>> result) throws CharacterCodingException {
-        // ignore
-    }
 
 }
