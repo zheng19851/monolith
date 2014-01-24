@@ -51,9 +51,14 @@ public class CodecClientTest {
      * @param transCode
      * @return
      */
-    private static String buildEBlockParams(String transCode) {
+    private static String buildCBlockParams(String transCode) {
 
-        return "";
+        String body = "";
+        if ("6200".equals(transCode)) {
+            body = build6200Params();
+        }
+
+        return body;
     }
 
     private static void test(String transCode) throws Exception {
@@ -82,38 +87,54 @@ public class CodecClientTest {
         socket.close();
     }
 
+    /**
+     * a + b + c
+     * 
+     * @param transCode
+     * @param out
+     * @throws Exception
+     */
     private static void writeBytes(String transCode, OutputStream out) throws Exception {
 
         String headerStr = buildHead(transCode);
 
-        String fixedParams = buildFixedParams(transCode);
+//        String fixedParams = buildFixedParams(transCode);
 
-        String eBlockParams = buildEBlockParams(transCode);
+        String cBlockParams = buildCBlockParams(transCode);
 
         IoBuffer bb = IoBuffer.allocate(256);
         bb.setAutoExpand(true);
+        
+       
 
         CharsetEncoder encoder = Constants.DEFAULT_CHARSET.newEncoder();
 
         int headerLen = headerStr.getBytes(Constants.DEFAULT_CHARSET).length;
+        
+        
 
-        int fixedLen = fixedParams.getBytes(Constants.DEFAULT_CHARSET).length;
+        //int fixedLen = fixedParams.getBytes(Constants.DEFAULT_CHARSET).length;
 
-        int eLen = eBlockParams.getBytes(Constants.DEFAULT_CHARSET).length;
+        int cLen = cBlockParams.getBytes(Constants.DEFAULT_CHARSET).length;
+        
+        int len = 4 + headerLen + cLen; // a + b + c = 整个报文长度
 
-        int dLen = headerLen + fixedLen;
+//        int dLen = headerLen + fixedLen;
+//        int bLen = headerLen ;
 
-        bb.putString(StringUtil.alignRight(String.valueOf(dLen), 8, "0"), encoder); // a
+//        bb.putString(StringUtil.alignRight(String.valueOf(bLen), 8, "0"), encoder); // a
+        
+        bb.putInt(len);
 
-        bb.putString(StringUtil.alignRight(String.valueOf(eLen), 8, "0"), encoder); // b
+//        bb.putString(StringUtil.alignRight(String.valueOf(cLen), 8, "0"), encoder); // b
 
-        bb.putString(StringUtil.alignRight("0", 16, "0"), encoder); // c
+//        bb.putString(StringUtil.alignRight("0", 16, "0"), encoder); // c
 
         bb.putString(headerStr, encoder);
-        bb.putString(fixedParams, encoder);
+//        bb.putString(fixedParams, encoder);
 
-        if (StringUtil.isNotBlank(eBlockParams)) {
-            bb.putString(eBlockParams, encoder);
+        if (StringUtil.isNotBlank(cBlockParams)) {
+            bb.putString(cBlockParams, encoder);
         }
 
         // bb.order(ProtocolDTO.byteOrder);

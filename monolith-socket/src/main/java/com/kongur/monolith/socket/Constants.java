@@ -76,26 +76,6 @@ public class Constants {
     public static final String  DEFAULT_TIME_FORMAT_STR        = "HHmmss";
 
     /**
-     * 银行报文，请求头字节长度
-     */
-    public static final int     BANK_REQUEST_HEADER_BYTES_LEN  = 70;
-
-    /**
-     * 银行报文，响应头字节长度
-     */
-    public static final int     BANK_RESPONSE_HEADER_BYTES_LEN = 102;
-
-    /**
-     * 交易所协议，请求头字节长度
-     */
-    public static final int     COMM_REQUEST_HEADER_BYTES_LEN  = 60;
-
-    /**
-     * 交易所协议，响应头字节长度
-     */
-    public static final int     COMM_RESPONSE_HEADER_BYTES_LEN = 124;
-
-    /**
      * 默认的创建buffer大小
      */
     public static final int     DEFAULT_BUFFER_SIZE            = 256;

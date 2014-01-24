@@ -3,7 +3,6 @@ package com.kongur.monolith.socket.mina;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 
-import com.kongur.monolith.socket.Constants;
 import com.kongur.monolith.socket.message.codec.CodecUtils;
 import com.kongur.monolith.socket.message.header.UpstreamHeader;
 

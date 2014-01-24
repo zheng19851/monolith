@@ -7,7 +7,6 @@ import java.util.Date;
 
 import com.kongur.monolith.lang.DateUtil;
 import com.kongur.monolith.lang.StringUtil;
-import com.kongur.monolith.socket.Constants;
 import com.kongur.monolith.socket.message.codec.CodecUtils;
 import com.kongur.monolith.socket.message.header.DownstreamHeader;
 
@@ -59,7 +58,7 @@ public class CommResponseHeader extends ResponseHeader implements DownstreamHead
 
         String transDate = this.getTransDate();
         if (StringUtil.isBlank(transDate)) {
-            transDate = DateUtil.getDateTime(Constants.DEFAULT_DATE_FORMAT_STR, new Date());
+            transDate = DateUtil.getDateTime(com.kongur.monolith.socket.Constants.DEFAULT_DATE_FORMAT_STR, new Date());
         }
         header.put(CodecUtils.getBufferAlignLeft(transDate, 8, encoder));
         header.put(CodecUtils.getIntBuffer(this.getFileCount(), 8, encoder));
@@ -73,5 +72,4 @@ public class CommResponseHeader extends ResponseHeader implements DownstreamHead
         return Constants.COMM_RESPONSE_HEADER_BYTES_LEN;
     }
 
-    
 }

@@ -1,7 +1,6 @@
 package com.kongur.monolith.socket.message.codec;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -18,7 +17,7 @@ import com.kongur.monolith.socket.buffer.ByteBuffers;
 public abstract class CodecUtils {
 
     public static void putString(ByteBuffer buffer, String value, CharsetEncoder encoder, String splitChar)
-                                                                                                           throws CharacterCodingException {
+                                                                                                           throws CodecException {
 
         putString(buffer, value, encoder, splitChar, true);
     }
@@ -31,10 +30,10 @@ public abstract class CodecUtils {
      * @param encoder
      * @param splitChar 分隔符
      * @param appendSplitChar 是否追加分隔符
-     * @throws CharacterCodingException
+     * @throws CodecException
      */
     public static void putString(ByteBuffer buffer, String value, CharsetEncoder encoder, String splitChar,
-                                 boolean appendSplitChar) throws CharacterCodingException {
+                                 boolean appendSplitChar) throws CodecException {
 
         if (StringUtil.isNotEmpty(value)) {
             // buffer.putString(value, encoder);
@@ -48,7 +47,7 @@ public abstract class CodecUtils {
     }
 
     public static void putString(ByteBuffer buffer, String value, CharsetEncoder encoder)
-                                                                                         throws CharacterCodingException {
+                                                                                         throws CodecException {
         putString(buffer, value, encoder, null, false);
     }
 
@@ -63,29 +62,29 @@ public abstract class CodecUtils {
         return value;
     }
 
-    public static int getInt(ByteBuffer buffer) throws CharacterCodingException {
+    public static int getInt(ByteBuffer buffer) throws CodecException {
         return getInt(buffer, Constants.DEFAULT_CHARSET);
     }
 
-    public static int getInt(ByteBuffer buffer, Charset charset) throws CharacterCodingException {
+    public static int getInt(ByteBuffer buffer, Charset charset) throws CodecException {
 
         String v = getString(buffer, charset, false);
         return Integer.valueOf(v);
     }
 
-    public static String getString(ByteBuffer buffer) throws CharacterCodingException {
+    public static String getString(ByteBuffer buffer) throws CodecException {
         return getString(buffer, Constants.DEFAULT_CHARSET, true);
     }
 
-    public static String getString(ByteBuffer buffer, Charset charset) throws CharacterCodingException {
+    public static String getString(ByteBuffer buffer, Charset charset) throws CodecException {
         return getString(buffer, charset, true);
     }
 
-    public static String getString(ByteBuffer buffer, boolean trim) throws CharacterCodingException {
+    public static String getString(ByteBuffer buffer, boolean trim) throws CodecException {
         return getString(buffer, Constants.DEFAULT_CHARSET, trim);
     }
 
-    public static String getString(ByteBuffer buffer, Charset charset, boolean trim) throws CharacterCodingException {
+    public static String getString(ByteBuffer buffer, Charset charset, boolean trim) throws CodecException {
 
         if (buffer.limit() == 0) {
             return null;
@@ -107,7 +106,7 @@ public abstract class CodecUtils {
     }
 
     public static String getString(ByteBuffer buffer, int startIndex, int size, CharsetDecoder decoder)
-                                                                                                       throws CharacterCodingException {
+                                                                                                       throws CodecException {
         return getString(buffer, startIndex, size, decoder, true);
     }
 
@@ -120,10 +119,10 @@ public abstract class CodecUtils {
      * @param decoder
      * @param trim 是否去掉前后空格
      * @return
-     * @throws CharacterCodingException
+     * @throws CodecException
      */
     public static String getString(ByteBuffer buffer, int startIndex, int len, CharsetDecoder decoder, boolean trim)
-                                                                                                                    throws CharacterCodingException {
+                                                                                                                    throws CodecException {
          ByteBuffer dataBuffer = ByteBuffers.getSlice(buffer, startIndex, len);
 
 //        byte[] dst = new byte[len];
@@ -141,7 +140,7 @@ public abstract class CodecUtils {
     }
 
     public static Long getLong(ByteBuffer buffer, int startIdx, int size, CharsetDecoder decoder)
-                                                                                                 throws CharacterCodingException {
+                                                                                                 throws CodecException {
 
         String v = getString(buffer, startIdx, size, decoder, false);
         if (StringUtil.isNotBlank(v)) {
@@ -269,7 +268,7 @@ public abstract class CodecUtils {
     }
 
     public static Integer getInt(ByteBuffer buffer, int startIndex, int size, CharsetDecoder decoder)
-                                                                                                     throws CharacterCodingException {
+                                                                                                     throws CodecException {
         String v = getString(buffer, startIndex, size, decoder);
 
         if (v == null || "".equals(v)) {

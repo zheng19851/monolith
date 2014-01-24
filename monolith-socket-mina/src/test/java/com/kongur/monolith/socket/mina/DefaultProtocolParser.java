@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 
-import com.kongur.monolith.lang.StringUtil;
 import com.kongur.monolith.socket.Constants;
 import com.kongur.monolith.socket.buffer.ByteBuffers;
 import com.kongur.monolith.socket.message.DownstreamMessage;
@@ -17,8 +16,6 @@ import com.kongur.monolith.socket.message.codec.MessageCodecFactory;
 import com.kongur.monolith.socket.message.codec.MessageDecoder;
 import com.kongur.monolith.socket.message.header.UpstreamHeader;
 import com.kongur.monolith.socket.protocol.AbstractProtocolParser;
-import com.kongur.monolith.socket.protocol.CallBack;
-import com.kongur.monolith.socket.protocol.ReadDTO;
 
 /**
  * 交易前置协议解析器
@@ -30,7 +27,7 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
     /**
      * 整个报文长度，固定8个字节
      */
-    public static final int                                         A_FIX_LEN     = 8;
+    public static final int                                         A_FIX_LEN     = 4;
 
     /**
      * B段表示报文头长度(固定长度8个字节)
@@ -72,7 +69,7 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
     /**
      * 从a段解析出来的d段长度
      */
-    private int                                                     dBytesLen     = -1;
+    private int                                                     dBytesLen     = 60; // -1 
 
     /**
      * 从b段解析出来的e段长度
@@ -109,6 +106,8 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
     private ByteBuffer                                              multBuffer;
 
     private MessageCodecFactory<UpstreamMessage, DownstreamMessage> messageCodecFactory;
+    
+    private int  len = -1;
 
     public DefaultProtocolParser(MessageCodecFactory<UpstreamMessage, DownstreamMessage> messageCodecFactory) {
         this.messageCodecFactory = messageCodecFactory;
@@ -150,23 +149,25 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
             public void doSuccess() throws CharacterCodingException {
                 aBuffer.flip();
 
-                aBlock = CodecUtils.getString(aBuffer, false);// aBuffer.getString(decoder);
+//                aBlock = CodecUtils.getString(aBuffer, false);// aBuffer.getString(decoder);
 
-                if (StringUtil.isBlank(aBlock) || aBlock.length() != A_FIX_LEN) {
-                    logger.error("a block error, aBlock=" + aBlock);
-                    throw new CodecException("error");
-                }
-
-                dBytesLen = Integer.valueOf(aBlock);
+//                if (StringUtil.isBlank(aBlock) || aBlock.length() != A_FIX_LEN) {
+//                    logger.error("a block error, aBlock=" + aBlock);
+//                    throw new CodecException("error");
+//                }
+//
+//                dBytesLen = Integer.valueOf(aBlock);
+                
+                len = aBuffer.getInt();
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("====read a block success====, ->" + aBlock + "<-");
+                    logger.debug("====read a block success====, ->" + len + "<-");
                 }
             }
 
             @Override
             public boolean hasRead() {
-                return StringUtil.isNotBlank(aBlock);
+                return len != -1;
             }
 
             @Override
@@ -175,120 +176,120 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
             }
         });
 
-        if (!readA.isSuccess()) {
+        if (!readA.success) {
             return null;
         }
 
         // b 段
-        ReadDTO readB = readBuffer(buffer, new CallBack() {
-
-            @Override
-            public void putBuffer(ByteBuffer buffer) {
-                bBuffer.put(buffer);
-            }
-
-            @Override
-            public int getFixLen() {
-                return B_FIX_LEN;
-            }
-
-            @Override
-            public int getReadBufferLen() {
-                return bBuffer.position();
-            }
-
-            @Override
-            public void newBuffer() {
-
-            }
-
-            @Override
-            public void doSuccess() throws CharacterCodingException {
-
-                bBuffer.flip();
-
-                bBlock = CodecUtils.getString(bBuffer, false);// bBuffer.getString(decoder);
-
-                if (StringUtil.isBlank(bBlock) || bBlock.length() != B_FIX_LEN) {
-                    logger.error("b block error, bBlock=" + bBlock);
-                    throw new CodecException(EnumMessageErrorCode.MESSAGE_ERROR);
-                }
-
-                eBytesLen = Integer.valueOf(bBlock);
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("====read b block success====, ->" + bBlock + "<-");
-                }
-            }
-
-            @Override
-            public boolean hasRead() {
-                return StringUtil.isNotBlank(bBlock);
-            }
-
-            @Override
-            public String getBlockName() {
-                return "b";
-            }
-        });
-
-        if (!readB.isSuccess()) {
-            return null;
-        }
-
-        // c 段
-        ReadDTO readC = readBuffer(buffer, new CallBack() {
-
-            @Override
-            public void putBuffer(ByteBuffer buffer) {
-                cBuffer.put(buffer);
-            }
-
-            @Override
-            public int getFixLen() {
-                return C_FIX_LEN;
-            }
-
-            @Override
-            public int getReadBufferLen() {
-                return cBuffer.position();
-            }
-
-            @Override
-            public void newBuffer() {
-            }
-
-            @Override
-            public void doSuccess() throws CharacterCodingException {
-                cBuffer.flip();
-
-                cBlock = CodecUtils.getString(cBuffer, false);// cBuffer.getString(decoder);
-
-                if (StringUtil.isBlank(cBlock) || cBlock.length() != getFixLen()) {
-                    logger.error("c block error, cBlock=" + cBlock);
-                    throw new CodecException(EnumMessageErrorCode.MESSAGE_ERROR);
-                }
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("====read c block success====, ->" + cBlock + "<-");
-                }
-
-            }
-
-            @Override
-            public boolean hasRead() {
-                return StringUtil.isNotBlank(cBlock);
-            }
-
-            @Override
-            public String getBlockName() {
-                return "c";
-            }
-        });
-
-        if (!readC.isSuccess()) {
-            return null;
-        }
+//        ReadDTO readB = readBuffer(buffer, new CallBack() {
+//
+//            @Override
+//            public void putBuffer(ByteBuffer buffer) {
+//                bBuffer.put(buffer);
+//            }
+//
+//            @Override
+//            public int getFixLen() {
+//                return B_FIX_LEN;
+//            }
+//
+//            @Override
+//            public int getReadBufferLen() {
+//                return bBuffer.position();
+//            }
+//
+//            @Override
+//            public void newBuffer() {
+//
+//            }
+//
+//            @Override
+//            public void doSuccess() throws CharacterCodingException {
+//
+//                bBuffer.flip();
+//
+//                bBlock = CodecUtils.getString(bBuffer, false);// bBuffer.getString(decoder);
+//
+//                if (StringUtil.isBlank(bBlock) || bBlock.length() != B_FIX_LEN) {
+//                    logger.error("b block error, bBlock=" + bBlock);
+//                    throw new CodecException(EnumMessageErrorCode.MESSAGE_ERROR);
+//                }
+//
+//                eBytesLen = Integer.valueOf(bBlock);
+//
+//                if (logger.isDebugEnabled()) {
+//                    logger.debug("====read b block success====, ->" + bBlock + "<-");
+//                }
+//            }
+//
+//            @Override
+//            public boolean hasRead() {
+//                return StringUtil.isNotBlank(bBlock);
+//            }
+//
+//            @Override
+//            public String getBlockName() {
+//                return "b";
+//            }
+//        });
+//
+//        if (!readB.success) {
+//            return null;
+//        }
+//
+//        // c 段
+//        ReadDTO readC = readBuffer(buffer, new CallBack() {
+//
+//            @Override
+//            public void putBuffer(ByteBuffer buffer) {
+//                cBuffer.put(buffer);
+//            }
+//
+//            @Override
+//            public int getFixLen() {
+//                return C_FIX_LEN;
+//            }
+//
+//            @Override
+//            public int getReadBufferLen() {
+//                return cBuffer.position();
+//            }
+//
+//            @Override
+//            public void newBuffer() {
+//            }
+//
+//            @Override
+//            public void doSuccess() throws CharacterCodingException {
+//                cBuffer.flip();
+//
+//                cBlock = CodecUtils.getString(cBuffer, false);// cBuffer.getString(decoder);
+//
+//                if (StringUtil.isBlank(cBlock) || cBlock.length() != getFixLen()) {
+//                    logger.error("c block error, cBlock=" + cBlock);
+//                    throw new CodecException(EnumMessageErrorCode.MESSAGE_ERROR);
+//                }
+//
+//                if (logger.isDebugEnabled()) {
+//                    logger.debug("====read c block success====, ->" + cBlock + "<-");
+//                }
+//
+//            }
+//
+//            @Override
+//            public boolean hasRead() {
+//                return StringUtil.isNotBlank(cBlock);
+//            }
+//
+//            @Override
+//            public String getBlockName() {
+//                return "c";
+//            }
+//        });
+//
+//        if (!readC.success) {
+//            return null;
+//        }
 
         // d 段 header
         ReadDTO readheader = readBuffer(buffer, new CallBack() {
@@ -301,7 +302,7 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
             @Override
             public void newBuffer() {
                 if (dBuffer == null) {
-                    dBuffer = ByteBuffer.allocate(dBytesLen);
+                    dBuffer = ByteBuffer.allocate(dBytesLen); // dBytesLen
                 }
             }
 
@@ -331,6 +332,8 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
                     ByteBuffer d = dBuffer.duplicate();
                     logger.debug("====read d block success====, ->" + CodecUtils.getString(d, false) + "<-");
                 }
+                
+                eBytesLen = len - 4 - dBytesLen;
             }
 
             @Override
@@ -344,7 +347,7 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
             }
         });
 
-        if (!readheader.isSuccess()) {
+        if (!readheader.success) {
             return null;
         }
 
@@ -359,7 +362,7 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
             @Override
             public void newBuffer() {
                 if (eBuffer == null) {
-                    eBuffer = ByteBuffer.allocate(eBytesLen);
+                    eBuffer = ByteBuffer.allocate(eBytesLen); // 整个报文 - A- B
                 }
             }
 
@@ -404,7 +407,7 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
             }
         });
 
-        if (!readBody.isSuccess()) {
+        if (!readBody.success) {
             return null;
         }
 
@@ -444,7 +447,7 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
         // }
 
         MessageDecoder<UpstreamMessage> messageDecoder = messageCodecFactory.getMessageDecoder(header.getTransCode());
-        DecodeResult<UpstreamMessage> result = messageDecoder.decode(this.fixedBuffer, this.multBuffer, header, decoder);
+        DecodeResult<UpstreamMessage> result = messageDecoder.decode(this.multBuffer, header, decoder);
 
         if (!result.isSuccess()) {
             throw new CodecException(header.getTransCode(), result.getResultCode(), result.getResultInfo());
@@ -519,66 +522,66 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
      * @return
      * @throws CharacterCodingException
      */
-//    private ReadDTO readBuffer(ByteBuffer buffer, CallBack call) throws CharacterCodingException {
-//
-//        ReadDTO read = new ReadDTO();
-//        if (call.hasRead()) {
-//            if (logger.isDebugEnabled()) {
-//                logger.debug("====" + call.getBlockName() + " block has read===");
-//            }
-//            call.newBuffer(); // 当返回出错时，避免bodyBuffer为空
-//            read.success = true;
-//            return read;
-//        }
-//
-//        if (!buffer.hasRemaining()) {
-//            return read;
-//        }
-//
-//        call.newBuffer();
-//
-//        int currPosition = buffer.position();
-//
-//        int currLen = call.getReadBufferLen();
-//
-//        int len = call.getFixLen();
-//
-//        if (currLen == len) {
-//            read.success = true;
-//            return read;
-//        }
-//
-//        // 实际读取的字节数
-//        int readBytes = 0;
-//
-//        int remain = buffer.limit() - buffer.position(); // buffer 里剩余字节数
-//        if (currLen == 0) {
-//            // 说明还没有任何数据
-//            readBytes = len > remain ? remain : len;
-//
-//        } else {
-//            int needBytes = len - currLen; // 还需要的字节数
-//            readBytes = needBytes > remain ? remain : needBytes;
-//        }
-//
-//        ByteBuffer needBuffer = ByteBuffers.getSlice(buffer, currPosition, readBytes); // 返回的是一个新的BUFFER
-//        call.putBuffer(needBuffer);
-//
-//        buffer.position(currPosition + readBytes);
-//
-//        if (call.getReadBufferLen() != len) {
-//            logger.warn(call.getBlockName() + " buffer has not enough bytes, this block should be " + len
-//                        + " bytes, but only" + call.getReadBufferLen() + " bytes");
-//            read.readBytes = readBytes;
-//            return read;
-//        }
-//
-//        call.doSuccess();
-//
-//        read.readBytes = readBytes;
-//        read.success = true;
-//        return read;
-//    }
+    private ReadDTO readBuffer(ByteBuffer buffer, CallBack call) throws CharacterCodingException {
+
+        ReadDTO read = new ReadDTO();
+        if (call.hasRead()) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("====" + call.getBlockName() + " block has read===");
+            }
+            call.newBuffer(); // 当返回出错时，避免bodyBuffer为空
+            read.success = true;
+            return read;
+        }
+
+        if (!buffer.hasRemaining()) {
+            return read;
+        }
+
+        call.newBuffer();
+
+        int currPosition = buffer.position();
+
+        int currLen = call.getReadBufferLen();
+
+        int len = call.getFixLen();
+
+        if (currLen == len) {
+            read.success = true;
+            return read;
+        }
+
+        // 实际读取的字节数
+        int readBytes = 0;
+
+        int remain = buffer.limit() - buffer.position(); // buffer 里剩余字节数
+        if (currLen == 0) {
+            // 说明还没有任何数据
+            readBytes = len > remain ? remain : len;
+
+        } else {
+            int needBytes = len - currLen; // 还需要的字节数
+            readBytes = needBytes > remain ? remain : needBytes;
+        }
+
+        ByteBuffer needBuffer = ByteBuffers.getSlice(buffer, currPosition, readBytes); // 返回的是一个新的BUFFER
+        call.putBuffer(needBuffer);
+
+        buffer.position(currPosition + readBytes);
+
+        if (call.getReadBufferLen() != len) {
+            logger.warn(call.getBlockName() + " buffer has not enough bytes, this block should be " + len
+                        + " bytes, but only" + call.getReadBufferLen() + " bytes");
+            read.readBytes = readBytes;
+            return read;
+        }
+
+        call.doSuccess();
+
+        read.readBytes = readBytes;
+        read.success = true;
+        return read;
+    }
 
     /**
      * 创建报文头对象
@@ -589,37 +592,37 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
         return new CommRequestHeader();
     }
 
-//    private class ReadDTO {
-//
-//        boolean     success;
-//
-//        /**
-//         * 字符串读取所在位置
-//         */
-//        private int currIndex;
-//
-//        /**
-//         * 读取的字节数
-//         */
-//        private int readBytes;
-//    }
-//
-//    private interface CallBack {
-//
-//        String getBlockName();
-//
-//        int getFixLen();
-//
-//        boolean hasRead();
-//
-//        int getReadBufferLen();
-//
-//        void putBuffer(ByteBuffer buffer);
-//
-//        void newBuffer();
-//
-//        void doSuccess() throws CharacterCodingException;
-//    }
+    private class ReadDTO {
+
+        boolean     success;
+
+        /**
+         * 字符串读取所在位置
+         */
+        private int currIndex;
+
+        /**
+         * 读取的字节数
+         */
+        private int readBytes;
+    }
+
+    private interface CallBack {
+
+        String getBlockName();
+
+        int getFixLen();
+
+        boolean hasRead();
+
+        int getReadBufferLen();
+
+        void putBuffer(ByteBuffer buffer);
+
+        void newBuffer();
+
+        void doSuccess() throws CharacterCodingException;
+    }
 
     @Override
     public String toString() {
@@ -635,10 +638,6 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
     }
 
 
-    @Override
-    protected int readLen(ByteBuffer buffer) {
-        return 0;
-    }
     
     
 

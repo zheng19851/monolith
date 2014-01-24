@@ -31,7 +31,9 @@ public abstract class AbstractMessageEncoder<DSO> implements MessageEncoder<DSO>
         result.setSuccess(true);
 
         try {
-            encodeMixBuf(dso, encoder, result);
+            ByteBuffer bodyBuf = doEncode(dso, encoder);
+
+            result.setBuffer(bodyBuf);
         } catch (Exception e) {
             throw new CodecException(e);
         }
@@ -43,50 +45,7 @@ public abstract class AbstractMessageEncoder<DSO> implements MessageEncoder<DSO>
         return result;
     }
 
-    /**
-     * 编码
-     * 
-     * @param dso
-     * @param encoder
-     * @param result
-     * @throws CharacterCodingException
-     */
-    protected void encodeMixBuf(DSO dso, CharsetEncoder encoder, EncodeResult result) throws CharacterCodingException {
-
-        ByteBuffer fixedBuff = encodeFixedBuf(dso, encoder, result);
-
-        if (!result.isSuccess()) {
-            return;
-        }
-
-        result.setBuffer(fixedBuff);
-
-        ByteBuffer multiBuff = encodeMultiBuf(dso, encoder);
-
-        result.setMultiBuff(multiBuff);
-    }
-
-    /**
-     * 编码循环体部分数据
-     * 
-     * @param dso
-     * @param encoder
-     * @return
-     * @throws CharacterCodingException
-     */
-    protected abstract ByteBuffer encodeMultiBuf(DSO dso, CharsetEncoder encoder) throws CharacterCodingException;
-
-    /**
-     * 编码定长部分数据，除报文头外
-     * 
-     * @param dso
-     * @param fixedBuff
-     * @param encoder
-     * @param result
-     * @throws CharacterCodingException
-     */
-    protected abstract ByteBuffer encodeFixedBuf(DSO dso, CharsetEncoder encoder, EncodeResult result)
-                                                                                                      throws CharacterCodingException;
+    protected abstract ByteBuffer doEncode(DSO dso, CharsetEncoder encoder) throws CharacterCodingException;
 
     /**
      * 分配ByteBuffer

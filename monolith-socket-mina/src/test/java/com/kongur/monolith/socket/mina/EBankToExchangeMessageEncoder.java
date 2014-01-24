@@ -6,7 +6,6 @@ import java.nio.charset.CharsetEncoder;
 
 import com.kongur.monolith.socket.message.codec.AbstractFixedMessageEncoder;
 import com.kongur.monolith.socket.message.codec.CodecUtils;
-import com.kongur.monolith.socket.message.codec.EncodeResult;
 
 /**
  * 交易所发起，银行转交易所 6200
@@ -17,8 +16,7 @@ import com.kongur.monolith.socket.message.codec.EncodeResult;
 public class EBankToExchangeMessageEncoder extends AbstractFixedMessageEncoder<TransferResponse> {
 
     @Override
-    protected ByteBuffer encodeFixedBuf(TransferResponse dso, CharsetEncoder encoder, EncodeResult result)
-                                                                                                          throws CharacterCodingException {
+    protected ByteBuffer doEncode(TransferResponse dso, CharsetEncoder encoder) throws CharacterCodingException {
 
         ByteBuffer buffer = allocateBuffer();
         // 银行账号 C(30) 银行客户结算账号 M

@@ -22,16 +22,26 @@ public interface MessageDecoder<USO> {
      */
     USO createUpstreamMessage(UpstreamHeader header);
 
+//    /**
+//     * 解码
+//     * 
+//     * @param fixedBuf 定长部分数据
+//     * @param multiBuf 循环部分数据
+//     * @param header 报文头
+//     * @param decoder
+//     * @return
+//     */
+//    DecodeResult<USO> decode(ByteBuffer fixedBuf, ByteBuffer multiBuf, UpstreamHeader header, CharsetDecoder decoder)
+//                                                                                                                     throws CodecException;
+
     /**
      * 解码
      * 
-     * @param fixedBuf 定长部分数据
-     * @param multiBuf 循环部分数据
+     * @param bodyBuf 报文体部分
      * @param header 报文头
      * @param decoder
      * @return
      */
-    DecodeResult<USO> decode(ByteBuffer fixedBuf, ByteBuffer multiBuf, UpstreamHeader header, CharsetDecoder decoder)
-                                                                                                                throws CodecException;
+    DecodeResult<USO> decode(ByteBuffer bodyBuf, UpstreamHeader header, CharsetDecoder decoder) throws CodecException;
 
 }
