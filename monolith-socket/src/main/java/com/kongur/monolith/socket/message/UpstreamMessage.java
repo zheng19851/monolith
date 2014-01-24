@@ -1,0 +1,20 @@
+package com.kongur.monolith.socket.message;
+
+import java.io.Serializable;
+
+import com.kongur.monolith.socket.message.header.UpstreamHeader;
+
+/**
+ * 对方过来的数据对象(包含对方的响应和请求)
+ * 
+ * @author zhengwei
+ */
+public interface UpstreamMessage extends Serializable {
+
+    void setUpstreamHeader(UpstreamHeader header);
+
+    UpstreamHeader getUpstreamHeader();
+    
+    String getTransCode();
+
+}
