@@ -1,12 +1,12 @@
 package com.kongur.monolith.socket.mina;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 import java.util.Date;
 
 import com.kongur.monolith.lang.DateUtil;
 import com.kongur.monolith.lang.StringUtil;
+import com.kongur.monolith.socket.message.codec.CodecException;
 import com.kongur.monolith.socket.message.codec.CodecUtils;
 import com.kongur.monolith.socket.message.header.DownstreamHeader;
 
@@ -43,7 +43,7 @@ public class CommResponseHeader extends ResponseHeader implements DownstreamHead
     }
 
     @Override
-    public void encode(ByteBuffer header, CharsetEncoder encoder) throws CharacterCodingException {
+    public void encode(ByteBuffer header, CharsetEncoder encoder) throws CodecException {
 
         // 交易代码 4 功能号
         // 请求方流水号 20 不足补空

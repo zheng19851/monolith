@@ -4,13 +4,14 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 
+import com.kongur.monolith.socket.message.codec.CodecException;
 
 /**
  * 响应和发送请求时的报文头
  * 
  * @author zhengwei
  */
-public interface DownstreamHeader {
+public interface DownstreamHeader extends Header {
 
     /**
      * 响应和发送请求时编码报文头
@@ -19,24 +20,6 @@ public interface DownstreamHeader {
      * @param encoder
      * @throws CharacterCodingException
      */
-    public void encode(ByteBuffer header, CharsetEncoder encoder) throws CharacterCodingException;
-
-    /**
-     * 交易代码
-     * 
-     * @return
-     */
-    public String getTransCode();
-
-    public void setTransCode(String transCode);
-
-    public boolean isSuccess();
-
-    /**
-     * 报文头固定长度(字节)
-     * 
-     * @return
-     */
-    public int getBytesLen();
+    public void encode(ByteBuffer header, CharsetEncoder encoder) throws CodecException;
 
 }

@@ -1,8 +1,8 @@
 package com.kongur.monolith.socket.mina;
 
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 
+import com.kongur.monolith.socket.message.codec.CodecException;
 import com.kongur.monolith.socket.message.codec.CodecUtils;
 import com.kongur.monolith.socket.message.header.UpstreamHeader;
 
@@ -55,7 +55,7 @@ public class CommRequestHeader extends RequestHeader implements UpstreamHeader {
     }
 
     @Override
-    public void decode(java.nio.ByteBuffer buffer, CharsetDecoder decoder) throws CharacterCodingException {
+    public void decode(java.nio.ByteBuffer buffer, CharsetDecoder decoder) throws CodecException {
         // 版本号 2 目前默认01
         // 交易代码 4 0001
         // 交易所编号 6

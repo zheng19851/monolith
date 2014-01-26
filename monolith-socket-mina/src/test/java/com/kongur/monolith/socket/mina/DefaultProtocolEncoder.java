@@ -1,7 +1,6 @@
 package com.kongur.monolith.socket.mina;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetEncoder;
 
 import org.apache.log4j.Logger;
@@ -27,7 +26,7 @@ import com.kongur.monolith.socket.message.codec.MessageEncoder;
 // @Service("defaultProtocolEncoder")
 public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
 
-    protected final Logger                                        log = Logger.getLogger(getClass());
+    protected final Logger                                          log = Logger.getLogger(getClass());
 
     private MessageCodecFactory<UpstreamMessage, DownstreamMessage> messageCodecFactory;
 
@@ -49,17 +48,17 @@ public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
         }
 
         ByteBuffer fixedBuf = dataResult.getBuffer();
-        ByteBuffer data = dataResult.getMultiBuff(); // 循环体部分
+        ByteBuffer data = null; // 循环体部分
 
         int dLen = getDBlockLen(header, fixedBuf);// call.getDBlockLen(header, null, data); // d段字节数
         int eLen = getEBlockLen(data); // e段字节数
 
         ByteBuffer aBuffer = CodecUtils.getBufferAlignRight(String.valueOf(dLen), DefaultProtocolParser.A_FIX_LEN,
-                                                          encoder);
+                                                            encoder);
         ByteBuffer bBuffer = CodecUtils.getBufferAlignRight(String.valueOf(eLen), DefaultProtocolParser.B_FIX_LEN,
-                                                          encoder);
+                                                            encoder);
         ByteBuffer cBuffer = CodecUtils.getBufferAlignLeft(Constants.ZERO, DefaultProtocolParser.C_FIX_LEN, encoder,
-                                                         Constants.ZERO_BYTE);
+                                                           Constants.ZERO_BYTE);
 
         if (log.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder("\r\n");
@@ -96,7 +95,7 @@ public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
             log.debug(sb.toString());
 
         }
-        
+
         StringBuilder sb = new StringBuilder("\r\n");
 
         ByteBuffer aBuff = aBuffer.duplicate();
@@ -128,7 +127,6 @@ public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
             sb.append("=====multi params string total bytes(0)");
         }
         System.out.println(sb.toString());
-        
 
         // 总字节数
         int totalBytes = DefaultProtocolParser.A_FIX_LEN + DefaultProtocolParser.B_FIX_LEN
@@ -145,7 +143,7 @@ public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
         if (data != null) {
             message.put(data);
         }
-        
+
         message.flip();
 
         if (log.isDebugEnabled()) {
@@ -156,12 +154,12 @@ public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
 
             ByteBuffer b = message.duplicate();
             build.append("=====buffer string total bytes(" + message.limit() + ") ->" + CodecUtils.getString(b, false)
-                      + "<-end" + "\r\n");
+                         + "<-end" + "\r\n");
 
             build.append("===================encode(" + dso.getTransCode() + ")====================" + "\r\n");
             log.debug(build.toString());
         }
-        
+
         output.write(IoBuffer.wrap(message));
     }
 
@@ -184,11 +182,7 @@ public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
 
         ByteBuffer header = ByteBuffer.allocate(dso.getDownstreamHeader().getBytesLen());
 
-        try {
-            dso.getDownstreamHeader().encode(header, encoder);
-        } catch (CharacterCodingException e) {
-            throw new CodecException(e);
-        }
+        dso.getDownstreamHeader().encode(header, encoder);
 
         header.flip();
 
