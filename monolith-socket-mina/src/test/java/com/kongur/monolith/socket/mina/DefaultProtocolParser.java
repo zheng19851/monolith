@@ -454,13 +454,13 @@ public class DefaultProtocolParser extends AbstractProtocolParser {
         }
 
         // ≥…π¶¡À
-        UpstreamMessage uso = result.getUso();
+        UpstreamMessage um = result.getUm();
 
         if (logger.isDebugEnabled()) {
-            log(header, uso);
+            log(header, um);
         }
 
-        return uso;
+        return um;
     }
 
     /**

@@ -7,13 +7,14 @@ import java.nio.charset.CharsetDecoder;
 import org.apache.log4j.Logger;
 
 import com.kongur.monolith.socket.Constants;
+import com.kongur.monolith.socket.message.UpstreamMessage;
 import com.kongur.monolith.socket.message.header.UpstreamHeader;
 
 /**
  * @author zhengwei
- * @param <USO>
+ * @param <UM>
  */
-public abstract class AbstractMessageDecoder<USO> implements MessageDecoder<USO> {
+public abstract class AbstractMessageDecoder<UM extends UpstreamMessage> implements MessageDecoder<UM> {
 
     protected final Logger logger    = Logger.getLogger(getClass());
 
@@ -30,16 +31,16 @@ public abstract class AbstractMessageDecoder<USO> implements MessageDecoder<USO>
     protected String       newBreak  = Constants.DEFAULT_NEW_BREAK;
 
     @Override
-    public DecodeResult<USO> decode(ByteBuffer bodyBuf, UpstreamHeader header, CharsetDecoder decoder)
-                                                                                                      throws CodecException {
+    public DecodeResult<UM> decode(ByteBuffer bodyBuf, UpstreamHeader header, CharsetDecoder decoder)
+                                                                                                     throws CodecException {
 
-        DecodeResult<USO> result = new DecodeResult<USO>();
+        DecodeResult<UM> result = new DecodeResult<UM>();
         result.setSuccess(true);
 
-        USO uso = createUpstreamMessage(header);
+        UM um = createUpstreamMessage(header);
         if (header == null || header.isSuccess()) {
             try {
-                doDecode(uso, bodyBuf, decoder, result);
+                doDecode(um, bodyBuf, decoder, result);
             } catch (Exception e) {
                 CodecException ce = new CodecException(e);
                 ce.setTransCode(header.getTransCode()).setErrorCode(EnumMessageErrorCode.ERROR.getCode()).setErrorMsg(EnumMessageErrorCode.ERROR.getMsg());
@@ -47,13 +48,13 @@ public abstract class AbstractMessageDecoder<USO> implements MessageDecoder<USO>
             }
         }
 
-        result.setUso(uso);
+        result.setUm(um);
 
         return result;
     }
 
-    protected abstract void doDecode(USO uso, ByteBuffer bodyBuf, CharsetDecoder decoder, DecodeResult<USO> result)
-                                                                                                                   throws CodecException;
+    protected abstract void doDecode(UM uso, ByteBuffer bodyBuf, CharsetDecoder decoder, DecodeResult<UM> result)
+                                                                                                                 throws CodecException;
 
     public Charset getCharset() {
         return charset;

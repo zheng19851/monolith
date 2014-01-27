@@ -10,7 +10,7 @@ import com.kongur.monolith.socket.message.header.UpstreamHeader;
  * 
  * @author zhengwei
  */
-public class UpstreamMessageSet<T> extends AbstractUpstreamMessage {
+public class UpstreamMessageSet<UM extends UpstreamMessage> extends AbstractUpstreamMessage {
 
     /**
      * 
@@ -19,7 +19,7 @@ public class UpstreamMessageSet<T> extends AbstractUpstreamMessage {
     /**
      * 结果集，一条记录对应其中一个元素
      */
-    private List<T>           upstreamMessageList;
+    private List<UM>          upstreamMessageList;
 
     public UpstreamMessageSet(UpstreamHeader header) {
         super(header);
@@ -29,17 +29,17 @@ public class UpstreamMessageSet<T> extends AbstractUpstreamMessage {
         return upstreamMessageList != null ? upstreamMessageList.size() : 0;
     }
 
-    public List<T> getUpstreamMessageList() {
+    public List<UM> getUpstreamMessageList() {
         return upstreamMessageList;
     }
 
-    public void setUpstreamMessageList(List<T> upstreamMessageList) {
+    public void setUpstreamMessageList(List<UM> upstreamMessageList) {
         this.upstreamMessageList = upstreamMessageList;
     }
 
-    public void addUpstreamMessage(T uso) {
+    public void addUpstreamMessage(UM uso) {
         if (this.upstreamMessageList == null) {
-            this.upstreamMessageList = new ArrayList<T>();
+            this.upstreamMessageList = new ArrayList<UM>();
         }
         this.upstreamMessageList.add(uso);
     }

@@ -7,21 +7,22 @@ import java.nio.charset.CharsetEncoder;
 import org.apache.log4j.Logger;
 
 import com.kongur.monolith.socket.Constants;
+import com.kongur.monolith.socket.message.DownstreamMessage;
 
 /**
  * Êý¾Ý±àÂëÆ÷
  * 
  * @author zhengwei
- * @param <DSO>
+ * @param <DM>
  */
-public abstract class AbstractMessageEncoder<DSO> implements MessageEncoder<DSO> {
+public abstract class AbstractMessageEncoder<DM extends DownstreamMessage> implements MessageEncoder<DM> {
 
     protected final Logger logger     = Logger.getLogger(getClass());
 
     private int            bufferSize = Constants.DEFAULT_BUFFER_SIZE;
 
     @Override
-    public EncodeResult encode(DSO dso, CharsetEncoder encoder) throws CodecException {
+    public EncodeResult encode(DM dso, CharsetEncoder encoder) throws CodecException {
 
         if (logger.isDebugEnabled()) {
             logger.debug("=====encode data start=====, dso=" + dso);
@@ -45,7 +46,7 @@ public abstract class AbstractMessageEncoder<DSO> implements MessageEncoder<DSO>
         return result;
     }
 
-    protected abstract ByteBuffer doEncode(DSO dso, CharsetEncoder encoder) throws CharacterCodingException;
+    protected abstract ByteBuffer doEncode(DM dso, CharsetEncoder encoder) throws CharacterCodingException;
 
     /**
      * ·ÖÅäByteBuffer

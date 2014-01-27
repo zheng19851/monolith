@@ -7,6 +7,7 @@ import java.nio.charset.CharsetDecoder;
 import org.apache.commons.lang.StringUtils;
 
 import com.kongur.monolith.lang.StringUtil;
+import com.kongur.monolith.socket.message.UpstreamMessage;
 import com.kongur.monolith.socket.message.UpstreamMessageSet;
 import com.kongur.monolith.socket.message.header.UpstreamHeader;
 
@@ -15,16 +16,16 @@ import com.kongur.monolith.socket.message.header.UpstreamHeader;
  * 
  * @author zhengwei
  */
-public abstract class AbstractMultiMessageDecoder<USO> extends AbstractMessageDecoder<UpstreamMessageSet<USO>> {
+public abstract class AbstractMultiMessageDecoder<UM extends UpstreamMessage> extends AbstractMessageDecoder<UpstreamMessageSet<UM>> {
 
     @Override
-    public UpstreamMessageSet<USO> createUpstreamMessage(UpstreamHeader header) {
-        return new UpstreamMessageSet<USO>(header);
+    public UpstreamMessageSet<UM> createUpstreamMessage(UpstreamHeader header) {
+        return new UpstreamMessageSet<UM>(header);
     }
 
     @Override
-    protected void doDecode(UpstreamMessageSet<USO> usoSet, ByteBuffer bodyBuf, CharsetDecoder decoder,
-                            DecodeResult<UpstreamMessageSet<USO>> result) throws CodecException {
+    protected void doDecode(UpstreamMessageSet<UM> usoSet, ByteBuffer bodyBuf, CharsetDecoder decoder,
+                            DecodeResult<UpstreamMessageSet<UM>> result) throws CodecException {
 
         try {
             String dataStr = CodecUtils.getString(bodyBuf, false);
@@ -42,7 +43,7 @@ public abstract class AbstractMultiMessageDecoder<USO> extends AbstractMessageDe
 
                 String[] fields = line.split(getSplitChar(), -1);
 
-                USO uso = createOneUpStreamObject();
+                UM uso = createOneUpstreamMessage();
 
                 doDecodeOne(uso, fields, result);
 
@@ -58,7 +59,7 @@ public abstract class AbstractMultiMessageDecoder<USO> extends AbstractMessageDe
 
     }
 
-    protected abstract USO createOneUpStreamObject();
+    protected abstract UM createOneUpstreamMessage();
 
     /**
      * 子类自己实现具体的解码工作
@@ -66,7 +67,7 @@ public abstract class AbstractMultiMessageDecoder<USO> extends AbstractMessageDe
      * @param buffer
      * @return
      */
-    protected abstract void doDecodeOne(USO uso, String[] fields, DecodeResult<UpstreamMessageSet<USO>> result)
-                                                                                                               throws CharacterCodingException;
+    protected abstract void doDecodeOne(UM uso, String[] fields, DecodeResult<UpstreamMessageSet<UM>> result)
+                                                                                                             throws CharacterCodingException;
 
 }

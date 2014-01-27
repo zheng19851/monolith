@@ -11,7 +11,7 @@ import com.kongur.monolith.socket.message.header.DownstreamHeader;
  * 
  * @author zhengwei
  */
-public class DownstreamMessageSet<DSO> extends AbstractDownstreamMessage implements DownstreamMessage {
+public class DownstreamMessageSet<DM extends DownstreamMessage> extends AbstractDownstreamMessage implements DownstreamMessage {
 
     /**
      * 
@@ -21,7 +21,7 @@ public class DownstreamMessageSet<DSO> extends AbstractDownstreamMessage impleme
     /**
      * 结果集，一条记录对应其中一个元素
      */
-    private List<DSO>         downstreamMessageList;
+    private List<DM>         downstreamMessageList;
 
     public DownstreamMessageSet(DownstreamHeader header) {
         super(header);
@@ -29,7 +29,7 @@ public class DownstreamMessageSet<DSO> extends AbstractDownstreamMessage impleme
 
     public DownstreamMessageSet(DownstreamHeader header, int size) {
         super(header);
-        this.downstreamMessageList = new ArrayList<DSO>(size);
+        this.downstreamMessageList = new ArrayList<DM>(size);
     }
 
     public DownstreamMessageSet(int size) {
@@ -41,17 +41,17 @@ public class DownstreamMessageSet<DSO> extends AbstractDownstreamMessage impleme
     }
 
     @SuppressWarnings("unchecked")
-    public List<DSO> getDownstreamMessageList() {
+    public List<DM> getDownstreamMessageList() {
         return downstreamMessageList == null ? Collections.EMPTY_LIST : downstreamMessageList;
     }
 
-    public void setDownstreamMessageList(List<DSO> downstreamMessageList) {
+    public void setDownstreamMessageList(List<DM> downstreamMessageList) {
         this.downstreamMessageList = downstreamMessageList;
     }
 
-    public void addDownstreamMessage(DSO dso) {
+    public void addDownstreamMessage(DM dso) {
         if (this.downstreamMessageList == null) {
-            this.downstreamMessageList = new ArrayList<DSO>();
+            this.downstreamMessageList = new ArrayList<DM>();
         }
 
         this.downstreamMessageList.add(dso);

@@ -6,21 +6,22 @@ import java.nio.charset.CharsetEncoder;
 import java.util.List;
 
 import com.kongur.monolith.socket.Constants;
+import com.kongur.monolith.socket.message.DownstreamMessage;
 import com.kongur.monolith.socket.message.DownstreamMessageSet;
 
 /**
  * 当报文体为多条数据时使用
  * 
  * @author zhengwei
- * @param <DSO>
+ * @param <DM>
  */
-public abstract class AbstractMultiMessageEncoder<DSO> extends AbstractMessageEncoder<DownstreamMessageSet<DSO>> {
+public abstract class AbstractMultiMessageEncoder<DM extends DownstreamMessage> extends AbstractMessageEncoder<DownstreamMessageSet<DM>> {
 
     @Override
-    protected ByteBuffer doEncode(DownstreamMessageSet<DSO> dsoSet, CharsetEncoder encoder)
-                                                                                           throws CharacterCodingException {
+    protected ByteBuffer doEncode(DownstreamMessageSet<DM> dsoSet, CharsetEncoder encoder)
+                                                                                          throws CharacterCodingException {
 
-        List<DSO> downstreamMessageList = dsoSet.getDownstreamMessageList();
+        List<DM> downstreamMessageList = dsoSet.getDownstreamMessageList();
         if (downstreamMessageList.isEmpty()) {
             return null;
         }
@@ -28,7 +29,7 @@ public abstract class AbstractMultiMessageEncoder<DSO> extends AbstractMessageEn
         ByteBuffer buffer = allocateBuffer();
 
         for (int i = 0, len = downstreamMessageList.size(); i < len; i++) {
-            DSO dso = downstreamMessageList.get(i);
+            DM dso = downstreamMessageList.get(i);
             ByteBuffer entryBuf = allocateBuffer();
 
             if (entryBuf.hasRemaining()) {
@@ -52,6 +53,6 @@ public abstract class AbstractMultiMessageEncoder<DSO> extends AbstractMessageEn
      * @param entryBuf
      * @param encoder
      */
-    protected abstract void encodeOne(DSO dso, ByteBuffer entryBuf, CharsetEncoder encoder);
+    protected abstract void encodeOne(DM dso, ByteBuffer entryBuf, CharsetEncoder encoder);
 
 }
