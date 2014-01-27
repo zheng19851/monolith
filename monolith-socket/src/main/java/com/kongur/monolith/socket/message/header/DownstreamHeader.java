@@ -20,6 +20,6 @@ public interface DownstreamHeader extends Header {
      * @param encoder
      * @throws CharacterCodingException
      */
-    public void encode(ByteBuffer header, CharsetEncoder encoder) throws CodecException;
+    public ByteBuffer encode(CharsetEncoder encoder) throws CodecException;
 
 }

@@ -1,10 +1,13 @@
 package com.kongur.monolith.socket.netty;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.replay.ReplayingDecoder;
 
+import com.kongur.monolith.socket.message.UpstreamMessage;
+import com.kongur.monolith.socket.message.codec.CodecUtils;
 import com.kongur.monolith.socket.netty.DefaultProtocolReplayingDecoder.DecoderState;
 import com.kongur.monolith.socket.protocol.ProtocolParser;
 
@@ -16,6 +19,8 @@ import com.kongur.monolith.socket.protocol.ProtocolParser;
  */
 public class DefaultProtocolReplayingDecoder extends ReplayingDecoder<DecoderState> {
 
+    protected final Logger log            = Logger.getLogger(getClass());
+
     /**
      * 报文体内容长度
      */
@@ -23,9 +28,19 @@ public class DefaultProtocolReplayingDecoder extends ReplayingDecoder<DecoderSta
 
     private ProtocolParser protocolParser = null;
 
+    public DefaultProtocolReplayingDecoder() {
+        super(DecoderState.READ_LENGTH);
+    }
+
     @Override
     protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buf, DecoderState state)
-                                                                                                               throws Exception {
+                                                                                                              throws Exception {
+
+        if (log.isDebugEnabled()) {
+            ChannelBuffer bufCopy = buf.copy();
+            log.debug("received buffer " + bufCopy.readableBytes() + " bytes, ->"
+                      + CodecUtils.getString(bufCopy.toByteBuffer()) + "<-");
+        }
 
         switch (state) {
             case READ_LENGTH:
@@ -34,7 +49,13 @@ public class DefaultProtocolReplayingDecoder extends ReplayingDecoder<DecoderSta
             case READ_CONTENT:
                 ChannelBuffer frame = buf.readBytes(this.length);
                 checkpoint(DecoderState.READ_LENGTH);
-                return protocolParser.parse(frame.toByteBuffer()); // 报文完整后才解析报文
+                UpstreamMessage um = protocolParser.parse(frame.toByteBuffer()); // 报文完整后才解析
+                if (log.isDebugEnabled()) {
+                    log.debug("decode " + um.getTransCode() + " successful! The UpstreamMessage=" + um);
+                }
+
+                this.length = -1;
+                return um;
             default:
                 throw new Error("Shouldn't reach here.");
         }

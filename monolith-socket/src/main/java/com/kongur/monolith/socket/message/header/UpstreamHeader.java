@@ -20,6 +20,6 @@ public interface UpstreamHeader extends Header {
      * @param decoder
      * @throws CharacterCodingException
      */
-    public void decode(ByteBuffer header, CharsetDecoder decoder) throws CodecException;
+    public void decode(ByteBuffer buffer, CharsetDecoder decoder) throws CodecException;
 
 }

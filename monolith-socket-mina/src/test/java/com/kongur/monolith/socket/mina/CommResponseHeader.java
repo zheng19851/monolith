@@ -43,7 +43,7 @@ public class CommResponseHeader extends ResponseHeader implements DownstreamHead
     }
 
     @Override
-    public void encode(ByteBuffer header, CharsetEncoder encoder) throws CodecException {
+    public ByteBuffer encode(CharsetEncoder encoder) throws CodecException {
 
         // 交易代码 4 功能号
         // 请求方流水号 20 不足补空
@@ -52,6 +52,8 @@ public class CommResponseHeader extends ResponseHeader implements DownstreamHead
         // 记录条数 8 前补0
         // 返回码 4 0000-正常，其他均为失败
         // 返回信息 60 具体错误信息
+
+        ByteBuffer header = ByteBuffer.allocate(getBytesLen());
         header.put(CodecUtils.getBufferAlignLeft(this.getTransCode(), 4, encoder));
         header.put(CodecUtils.getBufferAlignLeft(this.getBizNo(), 20, encoder));
         header.put(CodecUtils.getBufferAlignLeft(this.getResBizNo(), 20, encoder));
@@ -64,6 +66,10 @@ public class CommResponseHeader extends ResponseHeader implements DownstreamHead
         header.put(CodecUtils.getIntBuffer(this.getFileCount(), 8, encoder));
         header.put(CodecUtils.getBufferAlignLeft(this.getErrorCode(), 4, encoder));
         header.put(CodecUtils.getBufferAlignLeft(this.getErrorMsg(), 60, encoder));
+        header.flip();
+        
+        
+        return header;
 
     }
 

@@ -180,11 +180,7 @@ public class DefaultProtocolEncoder extends ProtocolEncoderAdapter {
             log.debug("=====encode Header start...");
         }
 
-        ByteBuffer header = ByteBuffer.allocate(dso.getDownstreamHeader().getBytesLen());
-
-        dso.getDownstreamHeader().encode(header, encoder);
-
-        header.flip();
+        ByteBuffer header = dso.getDownstreamHeader().encode(encoder);
 
         if (log.isDebugEnabled()) {
             log.debug("=====encode Header end, header bytes=" + header.limit());

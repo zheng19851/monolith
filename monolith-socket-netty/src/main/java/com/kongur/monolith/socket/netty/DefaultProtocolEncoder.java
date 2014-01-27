@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
+import org.apache.log4j.Logger;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -14,6 +15,8 @@ import org.jboss.netty.channel.SimpleChannelDownstreamHandler;
 import com.kongur.monolith.socket.Constants;
 import com.kongur.monolith.socket.message.DownstreamMessage;
 import com.kongur.monolith.socket.message.UpstreamMessage;
+import com.kongur.monolith.socket.message.codec.CodecException;
+import com.kongur.monolith.socket.message.codec.CodecUtils;
 import com.kongur.monolith.socket.message.codec.EncodeResult;
 import com.kongur.monolith.socket.message.codec.MessageCodecFactory;
 import com.kongur.monolith.socket.message.codec.MessageEncoder;
@@ -27,6 +30,8 @@ import com.kongur.monolith.socket.message.header.DownstreamHeader;
  */
 public class DefaultProtocolEncoder extends SimpleChannelDownstreamHandler {
 
+    protected final Logger                                          log            = Logger.getLogger(getClass());
+
     private Charset                                                 defaultCharset = Constants.DEFAULT_CHARSET;
 
     private MessageCodecFactory<UpstreamMessage, DownstreamMessage> messageCodecFactory;
@@ -37,14 +42,39 @@ public class DefaultProtocolEncoder extends SimpleChannelDownstreamHandler {
         CharsetEncoder encoder = defaultCharset.newEncoder();
 
         DownstreamHeader header = dm.getDownstreamHeader(); // 报文头(固定部分)
-        ByteBuffer headerBuf = ByteBuffer.allocate(header.getBytesLen());
-        header.encode(headerBuf, encoder);
-        headerBuf.flip();
+        ByteBuffer headerBuf = header.encode(encoder);
+
+        if (log.isDebugEnabled()) {
+            ByteBuffer headerCopy = headerBuf.duplicate();
+            StringBuilder sb = new StringBuilder();
+            sb.append("=====================encode header(transCode=" + dm.getTransCode() + ", bytes="
+                      + headerCopy.limit() + ")===================");
+            sb.append("->" + CodecUtils.getString(headerCopy) + "<-");
+            sb.append("=====================encode header===================");
+            log.debug(sb.toString());
+        }
 
         MessageEncoder<DownstreamMessage> messageEncoder = messageCodecFactory.getMessageEncoder(dm.getTransCode());
         EncodeResult encodeResult = messageEncoder.encode(dm, encoder);
 
+        if (!encodeResult.isSuccess()) {
+            throw new CodecException(dm.getTransCode(), encodeResult.getResultCode(), encodeResult.getResultInfo());
+        }
+
+        if (log.isDebugEnabled()) {
+            ByteBuffer bodyCopy = encodeResult.getBuffer().duplicate();
+            StringBuilder sb = new StringBuilder();
+            sb.append("=====================encode body(transCode=" + dm.getTransCode() + ", bytes=" + bodyCopy.limit()
+                      + ")===================");
+            sb.append("->" + CodecUtils.getString(bodyCopy) + "<-");
+            sb.append("=====================encode body===================");
+            log.debug(sb.toString());
+        }
+
         int contentLen = headerBuf.limit() + encodeResult.getBuffer().position(); // 内容部分长度
+
+        int totalBytes = getMessageLen() + contentLen;
+
         ChannelBuffer buf = ChannelBuffers.buffer(getMessageLen() + contentLen);
 
         writeMessageLen(buf, contentLen);
@@ -53,6 +83,10 @@ public class DefaultProtocolEncoder extends SimpleChannelDownstreamHandler {
         buf.writeBytes(encodeResult.getBuffer());
 
         Channels.write(ctx, e.getFuture(), buf);
+
+        if (log.isDebugEnabled()) {
+            log.debug("encode " + dm.getTransCode() + " successful! wrote " + totalBytes + " bytes");
+        }
     }
 
     protected void writeMessageLen(ChannelBuffer buf, int contentLen) {
