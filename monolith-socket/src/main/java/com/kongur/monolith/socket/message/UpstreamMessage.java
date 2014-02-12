@@ -13,8 +13,18 @@ public interface UpstreamMessage extends Serializable {
 
     void setUpstreamHeader(UpstreamHeader header);
 
+    /**
+     * 报文头
+     * 
+     * @return
+     */
     UpstreamHeader getUpstreamHeader();
-    
+
+    /**
+     * 交易码
+     * 
+     * @return
+     */
     String getTransCode();
 
 }

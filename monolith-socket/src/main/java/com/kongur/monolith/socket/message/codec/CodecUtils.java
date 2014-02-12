@@ -46,8 +46,7 @@ public abstract class CodecUtils {
         }
     }
 
-    public static void putString(ByteBuffer buffer, String value, CharsetEncoder encoder)
-                                                                                         throws CodecException {
+    public static void putString(ByteBuffer buffer, String value, CharsetEncoder encoder) throws CodecException {
         putString(buffer, value, encoder, null, false);
     }
 
@@ -84,6 +83,16 @@ public abstract class CodecUtils {
         return getString(buffer, Constants.DEFAULT_CHARSET, trim);
     }
 
+    
+    /**
+     * 转成string
+     * 
+     * @param buffer ByteBuffer
+     * @param charset
+     * @param trim 是否去掉前后空格
+     * @return
+     * @throws CodecException
+     */
     public static String getString(ByteBuffer buffer, Charset charset, boolean trim) throws CodecException {
 
         if (buffer.limit() == 0) {
@@ -123,24 +132,19 @@ public abstract class CodecUtils {
      */
     public static String getString(ByteBuffer buffer, int startIndex, int len, CharsetDecoder decoder, boolean trim)
                                                                                                                     throws CodecException {
-         ByteBuffer dataBuffer = ByteBuffers.getSlice(buffer, startIndex, len);
+        ByteBuffer dataBuffer = ByteBuffers.getSlice(buffer, startIndex, len);
 
-//        byte[] dst = new byte[len];
-//        buffer.get(dst, startIndex, len);
-//         ByteBuffer dataBuffer = ByteBuffer.allocate(len);
+        // byte[] dst = new byte[len];
+        // buffer.get(dst, startIndex, len);
+        // ByteBuffer dataBuffer = ByteBuffer.allocate(len);
         // dataBuffer.put(dst);
         // dataBuffer.flip();
-        String v = getString(dataBuffer);
+        String v = getString(dataBuffer, Constants.DEFAULT_CHARSET, trim);
 
-        if (!trim) {
-            return v;
-        }
-
-        return StringUtil.trim(v);
+        return v;
     }
 
-    public static Long getLong(ByteBuffer buffer, int startIdx, int size, CharsetDecoder decoder)
-                                                                                                 throws CodecException {
+    public static Long getLong(ByteBuffer buffer, int startIdx, int size, CharsetDecoder decoder) throws CodecException {
 
         String v = getString(buffer, startIdx, size, decoder, false);
         if (StringUtil.isNotBlank(v)) {

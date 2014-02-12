@@ -16,7 +16,7 @@ public interface UpstreamHeader extends Header {
     /**
      * 解码, 接收到请求或者收到响应时，需要实现这个方法
      * 
-     * @param header
+     * @param buffer 报文头 buffer
      * @param decoder
      * @throws CharacterCodingException
      */

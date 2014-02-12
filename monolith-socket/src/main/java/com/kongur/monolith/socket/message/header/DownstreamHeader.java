@@ -16,7 +16,6 @@ public interface DownstreamHeader extends Header {
     /**
      * 响应和发送请求时编码报文头
      * 
-     * @param header
      * @param encoder
      * @throws CharacterCodingException
      */

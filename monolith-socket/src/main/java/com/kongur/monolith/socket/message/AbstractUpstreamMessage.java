@@ -12,6 +12,10 @@ public abstract class AbstractUpstreamMessage extends DomainBase implements Upst
      * 
      */
     private static final long serialVersionUID = 4573854638741109827L;
+    
+    /**
+     * ±¨ÎÄÍ·
+     */
     private UpstreamHeader    header;
 
     public AbstractUpstreamMessage(UpstreamHeader header) {

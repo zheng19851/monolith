@@ -17,9 +17,10 @@ public abstract class AbstractDownstreamMessage extends DomainBase implements Do
 
     protected final Logger    log              = Logger.getLogger(getClass());
 
+    /**
+     * 头部数据
+     */
     private DownstreamHeader  header;
-
-    // private MessageCodecFactory<UpStreamObject, DownStreamObject> messageCodecFactory;
 
     public AbstractDownstreamMessage(DownstreamHeader header) {
         this.header = header;
