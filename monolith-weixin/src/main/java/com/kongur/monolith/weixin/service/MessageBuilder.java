@@ -1,5 +1,7 @@
 package com.kongur.monolith.weixin.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.kongur.monolith.weixin.domain.Message;
 
 
@@ -14,7 +16,7 @@ import com.kongur.monolith.weixin.domain.Message;
  */
 public interface MessageBuilder {
 
-    Message build(String signature, String timestamp, String nonce, String echostr, String receivedMsg);
+    Message build(HttpServletRequest req);
     
 }
 

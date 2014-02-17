@@ -1,5 +1,7 @@
 package com.kongur.monolith.weixin.domain;
 
+import java.util.Map;
+
 /**
  * 接收到的消息
  * 
@@ -35,5 +37,28 @@ public interface Message {
      * @return
      */
     String getNonce();
+
+    /**
+     * 消息业务数据
+     * 
+     * @return
+     */
+    Map<String, Object> getParams();
+
+    /**
+     * 获取业务数据
+     * 
+     * @param key
+     * @return
+     */
+    String getParamString(String key);
+
+    /**
+     * 获取业务数据
+     * 
+     * @param key
+     * @return
+     */
+    Object getParam(String key);
 
 }
