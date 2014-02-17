@@ -1,0 +1,10 @@
+<html>
+
+<a href="index.html">home</a>
+#include("contain/head.vm")
+
+$screen_content
+
+#include("contain/foot.vm")
+
+</html>
