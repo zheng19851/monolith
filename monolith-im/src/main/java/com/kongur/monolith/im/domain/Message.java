@@ -10,6 +10,76 @@ import java.util.Map;
  */
 public interface Message {
 
+    Message NULL_MESSAGE = new Message() {
+
+                             @Override
+                             public String getToUserName() {
+                                 return null;
+                             }
+
+                             @Override
+                             public String getTimestamp() {
+                                 return null;
+                             }
+
+                             @Override
+                             public String getString(String key) {
+                                 return null;
+                             }
+
+                             @Override
+                             public String getSignature() {
+                                 return null;
+                             }
+
+                             @Override
+                             public Map<String, Object> getParams() {
+                                 return null;
+                             }
+
+                             @Override
+                             public Object getParam(String key) {
+                                 return null;
+                             }
+
+                             @Override
+                             public String getNonce() {
+                                 return null;
+                             }
+
+                             @Override
+                             public String getMsgType() {
+                                 return null;
+                             }
+
+                             @Override
+                             public String getMsgId() {
+                                 return null;
+                             }
+
+                             @Override
+                             public String getFromUserName() {
+                                 return null;
+                             }
+
+                             @Override
+                             public long getCreateTime() {
+                                 return -1;
+                             }
+
+                             @Override
+                             public boolean containsKey(String key) {
+                                 return false;
+                             }
+                         };
+
+    /**
+     * 消息ID
+     * 
+     * @return
+     */
+    String getMsgId();
+
     /**
      * 返回消息类型
      * 
@@ -39,6 +109,27 @@ public interface Message {
     String getNonce();
 
     /**
+     * 发消息方
+     * 
+     * @return
+     */
+    String getFromUserName();
+
+    /**
+     * 获取收消息方
+     * 
+     * @return
+     */
+    String getToUserName();
+
+    /**
+     * 创建时间
+     * 
+     * @return
+     */
+    long getCreateTime();
+
+    /**
      * 消息业务数据
      * 
      * @return
@@ -51,7 +142,7 @@ public interface Message {
      * @param key
      * @return
      */
-    String getParamString(String key);
+    String getString(String key);
 
     /**
      * 获取业务数据
@@ -60,7 +151,7 @@ public interface Message {
      * @return
      */
     Object getParam(String key);
-    
+
     /**
      * 是否包含这个参数
      * 

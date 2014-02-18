@@ -1,4 +1,6 @@
-package com.kongur.monolith.im.weixin.domain;
+package com.kongur.monolith.im.weixin.domain.message.normal;
+
+import java.util.Map;
 
 import com.kongur.monolith.im.domain.AbstractMessage;
 
@@ -15,6 +17,10 @@ public class NormalMessage extends AbstractMessage {
 
     public NormalMessage(String signature, String timestamp, String nonce) {
         super(signature, timestamp, nonce);
+    }
+    
+    public NormalMessage(String signature, String timestamp, String nonce, Map<String, Object> params) {
+        super(signature, timestamp, nonce, params);
     }
 
     /**

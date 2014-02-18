@@ -1,7 +1,7 @@
 package com.kongur.monolith.im.serivce;
 
 import com.kongur.monolith.im.domain.Message;
-import com.kongur.monolith.im.domain.ProcessResult;
+import com.kongur.monolith.im.domain.ServiceResult;
 
 /**
  * 消息处理服务
@@ -20,6 +20,6 @@ public interface MessageProcessService<M extends Message> {
      * @param msg
      * @return
      */
-    ProcessResult process(M msg);
+    ServiceResult<String> process(M msg);
 
 }

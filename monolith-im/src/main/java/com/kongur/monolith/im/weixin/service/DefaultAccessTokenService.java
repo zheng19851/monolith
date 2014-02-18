@@ -71,6 +71,9 @@ public class DefaultAccessTokenService implements AccessTokenService {
      */
     private int                      refreshPeriod      = 5400;
 
+    @Value("${weixin.api.token.refresh.disable}")
+    private boolean                  disableRefresh     = false;
+
     @PostConstruct
     public void init() {
 
@@ -90,17 +93,20 @@ public class DefaultAccessTokenService implements AccessTokenService {
             executor = Executors.newSingleThreadScheduledExecutor();
         }
 
-        executor.scheduleAtFixedRate(new Runnable() {
+        if (!disableRefresh) {
+            executor.scheduleAtFixedRate(new Runnable() {
 
-            @Override
-            public void run() {
-                try {
-                    refresh();
-                } catch (Exception e) {
-                    log.error("refresh access token error, apiTokenUrl=" + apiTokenUrl, e);
+                @Override
+                public void run() {
+                    try {
+                        refresh();
+                    } catch (Exception e) {
+                        log.error("refresh access token error, apiTokenUrl=" + apiTokenUrl, e);
+                    }
                 }
-            }
-        }, 5, this.refreshPeriod, TimeUnit.SECONDS);
+            }, 5, this.refreshPeriod, TimeUnit.SECONDS);
+        }
+
     }
 
     /**

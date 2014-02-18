@@ -1,5 +1,7 @@
 package com.kongur.monolith.im.serivce;
 
+import com.kongur.monolith.im.domain.Message;
+
 
 /**
  * 消息处理器创建工厂
@@ -9,6 +11,12 @@ package com.kongur.monolith.im.serivce;
  */
 public interface MessageProcessServiceFactory {
 
-    MessageProcessService createMessageProcessService(String msgType);
+    /**
+     * 创建对应的消息服务
+     * 
+     * @param msgType
+     * @return
+     */
+    MessageProcessService<Message> createMessageProcessService(String msgType);
 
 }

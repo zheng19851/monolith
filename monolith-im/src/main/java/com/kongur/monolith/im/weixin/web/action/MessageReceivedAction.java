@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kongur.monolith.im.domain.Message;
-import com.kongur.monolith.im.domain.ProcessResult;
+import com.kongur.monolith.im.domain.ServiceResult;
 import com.kongur.monolith.im.serivce.MessageBuilder;
 import com.kongur.monolith.im.serivce.MessageProcessService;
 import com.kongur.monolith.im.serivce.MessageProcessServiceFactory;
@@ -50,23 +50,23 @@ public class MessageReceivedAction {
     String echostr, HttpServletRequest req) {
 
         Message msg = messageBuilder.build(req);
-        if (msg == null) {
+        if (msg == Message.NULL_MESSAGE) {
             return null;
         }
 
-        MessageProcessService messageProcessService = messageProcessServiceFactory.createMessageProcessService(msg.getMsgType());
+        MessageProcessService<Message> messageProcessService = messageProcessServiceFactory.createMessageProcessService(msg.getMsgType());
 
         if (messageProcessService == null) {
             return null;
         }
 
-        ProcessResult result = messageProcessService.process(msg);
+        ServiceResult<String> result = messageProcessService.process(msg);
 
         if (!result.isSuccess()) {
             return null;
         }
 
-        return result.getData();
+        return result.getResult();
     }
 
 }

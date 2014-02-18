@@ -5,7 +5,7 @@ import javax.annotation.Resource;
 import org.apache.log4j.Logger;
 
 import com.kongur.monolith.im.domain.Message;
-import com.kongur.monolith.im.domain.ProcessResult;
+import com.kongur.monolith.im.domain.ServiceResult;
 
 /**
  * @author zhengwei
@@ -19,9 +19,9 @@ public abstract class AbstractMessageProcessService<M extends Message> implement
     private SignatureValidator signatureValidator;
 
     @Override
-    public ProcessResult process(M msg) {
+    public ServiceResult<String> process(M msg) {
 
-        ProcessResult result = new ProcessResult();
+        ServiceResult<String> result = new ServiceResult<String>();
         result.setSuccess(true);
 
         preProcess(msg, result);
@@ -41,7 +41,7 @@ public abstract class AbstractMessageProcessService<M extends Message> implement
         return result;
     }
 
-    protected void postProcess(M msg, ProcessResult result) {
+    protected void postProcess(M msg, ServiceResult<String> result) {
 
         if (log.isDebugEnabled()) {
             log.debug("process message finished...");
@@ -54,7 +54,7 @@ public abstract class AbstractMessageProcessService<M extends Message> implement
      * @param msg
      * @param result
      */
-    protected void preProcess(M msg, ProcessResult result) {
+    protected void preProcess(M msg, ServiceResult<String> result) {
         if (log.isDebugEnabled()) {
             log.debug("process message start...");
         }
@@ -65,7 +65,7 @@ public abstract class AbstractMessageProcessService<M extends Message> implement
             return ;
         }
         
-        // TODO aaa-zhengwei 在这里实现消息去重？
+        // TODO aaa-zhengwei 在这里实现消息去重？不重复就保存到数据库
         
     }
 
@@ -76,6 +76,6 @@ public abstract class AbstractMessageProcessService<M extends Message> implement
      * @param result
      * @return
      */
-    protected abstract void doProcess(M msg, ProcessResult result);
+    protected abstract void doProcess(M msg, ServiceResult<String> result);
 
 }

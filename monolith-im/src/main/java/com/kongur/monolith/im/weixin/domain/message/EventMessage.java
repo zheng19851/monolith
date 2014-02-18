@@ -1,4 +1,4 @@
-package com.kongur.monolith.im.weixin.domain;
+package com.kongur.monolith.im.weixin.domain.message;
 
 import com.kongur.monolith.im.domain.AbstractMessage;
 

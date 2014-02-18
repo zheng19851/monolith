@@ -1,10 +1,10 @@
-package com.kongur.monolith.im.weixin.service.process;
+package com.kongur.monolith.im.weixin.service.message;
 
 import org.springframework.stereotype.Service;
 
-import com.kongur.monolith.im.domain.ProcessResult;
+import com.kongur.monolith.im.domain.ServiceResult;
 import com.kongur.monolith.im.serivce.AbstractMessageProcessService;
-import com.kongur.monolith.im.weixin.domain.DeveloperValidateMessage;
+import com.kongur.monolith.im.weixin.domain.message.DeveloperValidateMessage;
 
 /**
  * 开发者认证
@@ -16,10 +16,10 @@ import com.kongur.monolith.im.weixin.domain.DeveloperValidateMessage;
 public class DeveloperValidateMessageProcessService extends AbstractMessageProcessService<DeveloperValidateMessage> {
 
     @Override
-    protected void doProcess(DeveloperValidateMessage msg, ProcessResult result) {
+    protected void doProcess(DeveloperValidateMessage msg, ServiceResult<String> result) {
 
 
-        result.setData(msg.getEchostr()); // 验证通过就原样返回随机字符串
+        result.setResult(msg.getEchostr()); // 验证通过就原样返回随机字符串
 
     }
 

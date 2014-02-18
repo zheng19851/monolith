@@ -16,7 +16,7 @@ import com.kongur.monolith.im.serivce.MessageProcessServiceFactory;
  * @author zhengwei
  * @date 2014-2-14
  */
-//@Service("defaultMessageProcessServiceFactory")
+// @Service("defaultMessageProcessServiceFactory")
 public class DefaultMessageProcessServiceFactory implements MessageProcessServiceFactory {
 
     private final Logger                                             log                      = Logger.getLogger(getClass());
@@ -41,11 +41,9 @@ public class DefaultMessageProcessServiceFactory implements MessageProcessServic
     // }
 
     @Override
-    public MessageProcessService createMessageProcessService(String msgType) {
+    public MessageProcessService<Message> createMessageProcessService(String msgType) {
 
-        MessageProcessService service = null;
-
-        service = messageProcessServiceMap.get(msgType);
+        MessageProcessService<Message> service = messageProcessServiceMap.get(msgType);
 
         if (service != null) {
             if (log.isDebugEnabled()) {
@@ -62,26 +60,20 @@ public class DefaultMessageProcessServiceFactory implements MessageProcessServic
         return service;
     }
 
-    
     public Map<String, MessageProcessService<Message>> getMessageProcessServiceMap() {
         return messageProcessServiceMap;
     }
 
-    
     public void setMessageProcessServiceMap(Map<String, MessageProcessService<Message>> messageProcessServiceMap) {
         this.messageProcessServiceMap = messageProcessServiceMap;
     }
 
-    
     public MessageProcessService<Message> getDefaultMessageProcessService() {
         return defaultMessageProcessService;
     }
 
-    
     public void setDefaultMessageProcessService(MessageProcessService<Message> defaultMessageProcessService) {
         this.defaultMessageProcessService = defaultMessageProcessService;
     }
-    
-    
 
 }

@@ -13,6 +13,7 @@
 	    <property name="messageProcessServiceMap">
 	        <map>
 	            <entry key="dvm" value-ref="developerValidateMessageProcessService"></entry>
+	            <entry key="text" value-ref="textMessageProcessService"></entry>
 	        </map>
 	    </property>
 	    <property name="defaultMessageProcessService" ref="discardMessageProcessService"></property>

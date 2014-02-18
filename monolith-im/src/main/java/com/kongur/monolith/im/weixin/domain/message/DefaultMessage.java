@@ -1,4 +1,4 @@
-package com.kongur.monolith.im.weixin.domain;
+package com.kongur.monolith.im.weixin.domain.message;
 
 import java.util.Map;
 

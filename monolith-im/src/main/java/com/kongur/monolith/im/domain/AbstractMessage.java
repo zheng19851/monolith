@@ -3,6 +3,7 @@ package com.kongur.monolith.im.domain;
 import java.util.Map;
 
 import com.kongur.monolith.common.DomainBase;
+import com.kongur.monolith.lang.StringUtil;
 
 /**
  * 消息抽象类
@@ -42,14 +43,6 @@ public abstract class AbstractMessage extends DomainBase implements Message {
      */
     private Map<String, Object> params           = null;
 
-    public String getMsgType() {
-        return msgType;
-    }
-
-    public void setMsgType(String msgType) {
-        this.msgType = msgType;
-    }
-
     public AbstractMessage(String signature, String timestamp, String nonce) {
         this(signature, timestamp, nonce, null);
     }
@@ -59,6 +52,24 @@ public abstract class AbstractMessage extends DomainBase implements Message {
         this.timestamp = timestamp;
         this.nonce = nonce;
         this.params = params;
+    }
+
+    @Override
+    public String getMsgId() {
+        return this.getString("MsgId");
+    }
+
+    public String getMsgType() {
+
+        String msgType = this.msgType;
+        if (StringUtil.isBlank(msgType)) {
+            msgType = this.getString("MsgType");
+        }
+        return msgType;
+    }
+
+    public void setMsgType(String msgType) {
+        this.msgType = msgType;
     }
 
     public String getSignature() {
@@ -95,7 +106,7 @@ public abstract class AbstractMessage extends DomainBase implements Message {
     }
 
     @Override
-    public String getParamString(String key) {
+    public String getString(String key) {
         Object obj = getParam(key);
 
         return obj != null ? obj.toString() : null;
@@ -109,6 +120,23 @@ public abstract class AbstractMessage extends DomainBase implements Message {
     @Override
     public boolean containsKey(String key) {
         return this.params != null && this.params.containsKey(key);
+    }
+
+    @Override
+    public String getFromUserName() {
+        return this.getString("FromUserName");
+    }
+
+    @Override
+    public String getToUserName() {
+
+        return this.getString("ToUserName");
+    }
+
+    @Override
+    public long getCreateTime() {
+        String createTime = this.getString("CreateTime");
+        return StringUtil.isNotBlank(createTime) ? Long.valueOf(createTime) : -1;
     }
 
 }

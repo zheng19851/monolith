@@ -16,6 +16,12 @@ import com.kongur.monolith.im.domain.Message;
  */
 public interface MessageBuilder {
 
+    /**
+     * 组装消息对象
+     * 
+     * @param req
+     * @return
+     */
     Message build(HttpServletRequest req);
     
 }
