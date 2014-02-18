@@ -3,7 +3,7 @@ package com.kongur.monolith.im.weixin.service.message;
 import org.springframework.stereotype.Service;
 
 import com.kongur.monolith.im.domain.ServiceResult;
-import com.kongur.monolith.im.serivce.AbstractMessageProcessService;
+import com.kongur.monolith.im.serivce.message.AbstractMessageProcessService;
 import com.kongur.monolith.im.weixin.domain.message.DeveloperValidateMessage;
 
 /**

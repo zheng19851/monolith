@@ -1,6 +1,6 @@
-package com.kongur.monolith.im.serivce;
+package com.kongur.monolith.im.serivce.message;
 
-import com.kongur.monolith.im.domain.Message;
+import com.kongur.monolith.im.domain.message.Message;
 
 
 /**

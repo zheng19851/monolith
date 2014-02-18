@@ -14,11 +14,6 @@ import javax.annotation.Resource;
 
 import net.sf.json.JSONObject;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,7 +22,6 @@ import org.springframework.util.Assert;
 import com.kongur.monolith.im.domain.ServiceResult;
 import com.kongur.monolith.im.serivce.AccessTokenService;
 import com.kongur.monolith.im.serivce.ApiService;
-import com.kongur.monolith.lang.StringUtil;
 
 /**
  * 微信 AccessToken 服务
@@ -44,7 +38,7 @@ public class DefaultAccessTokenService implements AccessTokenService {
     private final Logger             log                = Logger.getLogger(getClass());
 
     /**
-     * 主动调用微信平台接口时需要用到
+     * 主动调用微信平台接口时需要用到(基础接口用)
      */
     private String                   accessToken;
 
@@ -112,13 +106,25 @@ public class DefaultAccessTokenService implements AccessTokenService {
     /**
      * 刷新AccessToken
      */
-    private void refresh() {
+    public ServiceResult<String> refresh() {
 
-        ServiceResult<String> result = apiService.executeGet(apiTokenUrl);
-        JSONObject jsonObj = JSONObject.fromObject(result.getResult());
+        final ServiceResult<String> result = new ServiceResult<String>();
 
+        ServiceResult<JSONObject> jsonResult = apiService.doGet(apiTokenUrl);
+
+        if (!jsonResult.isSuccess()) {
+            log.error("refresh access token error, apiTokenUrl=" + apiTokenUrl + ", errorCode="
+                      + jsonResult.getResultCode() + ", errorInfo=" + jsonResult.getResultInfo());
+
+            result.setError(jsonResult.getResultCode(), jsonResult.getResultInfo());
+            return result;
+        }
+
+        final JSONObject jsonObj = jsonResult.getResult();
+
+        String accessToken = null;
         if (jsonObj.containsKey("access_token")) {
-            String accessToken = jsonObj.getString("access_token");
+            accessToken = jsonObj.getString("access_token");
             WriteLock lock = this.readWriteLock.writeLock();
             lock.lock();
 
@@ -128,9 +134,19 @@ public class DefaultAccessTokenService implements AccessTokenService {
                 lock.unlock();
             }
 
+            if (log.isDebugEnabled()) {
+                log.debug("refresh access token successfully, new AccessToken=" + accessToken);
+            }
+
         } else {
-            log.error("refresh access token error, response=" + result.getResult());
+            log.error("refresh access token error, response=" + jsonResult.getResult());
+            result.setError("2001", "can not find access token.");
+            return result;
         }
+
+        result.setResult(accessToken);
+        result.setSuccess(true);
+        return result;
 
     }
 
@@ -154,40 +170,6 @@ public class DefaultAccessTokenService implements AccessTokenService {
     public void destroy() {
         if (this.executor != null) {
             this.executor.shutdown();
-        }
-    }
-
-    public static void main(String[] args) {
-        // String obj = "{\"access_token\":\"ACCESS_TOKEN\",\"expires_in\":7200}";
-        // JSONObject jsonObj = JSONObject.fromObject(obj);
-        //
-        // System.out.println(jsonObj.entrySet());
-        //
-        //
-        // Map<String, String> map = new HashMap<String, String>();
-        // jsonObj.putAll(map);
-        //
-        // System.out.println(map);
-
-        String appId = "wxe58afcd99f7a997e";
-        String appSecret = "5dcf8eac1e99e983fc58e42376ab0267";
-        String apiTokenPattern = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={0}&secret={1}";
-        String apiToken = MessageFormat.format(apiTokenPattern, appId, appSecret);
-        HttpClient httpClient = new DefaultHttpClient();
-
-        HttpGet httpGet = new HttpGet(apiToken);
-        try {
-            HttpResponse response = httpClient.execute(httpGet);
-            String jsonData = EntityUtils.toString(response.getEntity(), "UTF-8");
-            if (StringUtil.isBlank(jsonData)) {
-                return;
-            }
-
-            JSONObject jsonObj = JSONObject.fromObject(jsonData);
-            System.out.println(jsonObj);
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 

@@ -1,4 +1,4 @@
-package com.kongur.monolith.im.domain;
+package com.kongur.monolith.im.domain.message;
 
 import java.util.Map;
 

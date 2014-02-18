@@ -6,7 +6,7 @@ import java.util.Date;
 import org.springframework.stereotype.Service;
 
 import com.kongur.monolith.im.domain.ServiceResult;
-import com.kongur.monolith.im.serivce.AbstractMessageProcessService;
+import com.kongur.monolith.im.serivce.message.AbstractMessageProcessService;
 import com.kongur.monolith.im.weixin.domain.message.normal.TextMessage;
 
 /**

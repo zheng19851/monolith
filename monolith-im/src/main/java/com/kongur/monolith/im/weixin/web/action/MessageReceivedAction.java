@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.kongur.monolith.im.domain.Message;
 import com.kongur.monolith.im.domain.ServiceResult;
-import com.kongur.monolith.im.serivce.MessageBuilder;
-import com.kongur.monolith.im.serivce.MessageProcessService;
-import com.kongur.monolith.im.serivce.MessageProcessServiceFactory;
+import com.kongur.monolith.im.domain.message.Message;
+import com.kongur.monolith.im.serivce.message.MessageBuilder;
+import com.kongur.monolith.im.serivce.message.MessageProcessService;
+import com.kongur.monolith.im.serivce.message.MessageProcessServiceFactory;
 
 /**
- * 微信消息接受服务
+ * 微信消息接收服务
  * 
  * @author zhengwei
  * @date 2014-2-14

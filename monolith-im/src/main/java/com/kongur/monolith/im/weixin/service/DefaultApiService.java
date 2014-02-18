@@ -3,6 +3,8 @@ package com.kongur.monolith.im.weixin.service;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.json.JSONObject;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -16,9 +18,12 @@ import org.springframework.stereotype.Service;
 
 import com.kongur.monolith.im.domain.ServiceResult;
 import com.kongur.monolith.im.serivce.ApiService;
-import com.kongur.monolith.im.serivce.ExecuteException;
+import com.kongur.monolith.im.serivce.ApiException;
 
 /**
+ * 
+ * 微信API接口服务
+ * 
  * @author zhengwei
  * @date 2014-2-17
  */
@@ -27,7 +32,7 @@ public class DefaultApiService implements ApiService {
 
     private final Logger log = Logger.getLogger(getClass());
 
-    public ServiceResult<String> executeGet(String apiUrl) throws ExecuteException {
+    public ServiceResult<String> executeGet(String apiUrl) throws ApiException {
 
         return this.executeGet(apiUrl, null);
     }
@@ -39,9 +44,9 @@ public class DefaultApiService implements ApiService {
      * @param getParams 请求参数，加在GET URL
      * @return
      */
-    public ServiceResult<String> executeGet(String apiUrl, Map<String, String> getParams) throws ExecuteException {
+    public ServiceResult<String> executeGet(String apiUrl, Map<String, String> getParams) throws ApiException {
 
-        ServiceResult<String> result = new ServiceResult<String>();
+        final ServiceResult<String> result = new ServiceResult<String>();
 
         String retData = null;
 
@@ -76,7 +81,7 @@ public class DefaultApiService implements ApiService {
 
         } catch (Exception e) {
             log.error("http get error, apiUrl=" + internalApiUrl, e);
-            throw new ExecuteException("http get error", e);
+            throw new ApiException("http get error", e);
         } finally {
             httpClient.getConnectionManager().shutdown(); // 关闭连接,释放资源
         }
@@ -86,9 +91,9 @@ public class DefaultApiService implements ApiService {
         return result;
     }
 
-    public ServiceResult<String> executePost(String apiUrl, String postParams) throws ExecuteException {
+    public ServiceResult<String> executePost(String apiUrl, String postParams) throws ApiException {
 
-        ServiceResult<String> result = new ServiceResult<String>();
+        final ServiceResult<String> result = new ServiceResult<String>();
 
         String internalApiUrl = apiUrl;
 
@@ -116,7 +121,7 @@ public class DefaultApiService implements ApiService {
 
         } catch (Exception e) {
             log.error("http post error, apiUrl=" + internalApiUrl, e);
-            throw new ExecuteException("http post error", e);
+            throw new ApiException("http post error", e);
         } finally {
             httpClient.getConnectionManager().shutdown(); // 关闭连接,释放资源
         }
@@ -124,6 +129,49 @@ public class DefaultApiService implements ApiService {
         result.setSuccess(true);
         result.setResult(retData);
 
+        return result;
+    }
+
+    @Override
+    public ServiceResult<JSONObject> doGet(String apiUrl) throws ApiException {
+        return this.doGet(apiUrl, null);
+    }
+
+    @Override
+    public ServiceResult<JSONObject> doGet(String apiUrl, Map<String, String> getParams) throws ApiException {
+
+        final ServiceResult<JSONObject> result = new ServiceResult<JSONObject>();
+
+        ServiceResult<String> dataResult = executeGet(apiUrl, getParams);
+
+        if (!dataResult.isSuccess()) {
+            result.setError(dataResult.getResultCode(), dataResult.getResultInfo());
+            return result;
+        }
+
+        JSONObject jsonObj = JSONObject.fromObject(dataResult.getResult());
+        result.setResult(jsonObj);
+
+        result.setSuccess(true);
+        return result;
+    }
+
+    @Override
+    public ServiceResult<JSONObject> doPost(String apiUrl, String postParams) throws ApiException {
+
+        final ServiceResult<JSONObject> result = new ServiceResult<JSONObject>();
+
+        ServiceResult<String> dataResult = executePost(apiUrl, postParams);
+
+        if (!dataResult.isSuccess()) {
+            result.setError(dataResult.getResultCode(), dataResult.getResultInfo());
+            return result;
+        }
+
+        JSONObject jsonObj = JSONObject.fromObject(dataResult.getResult());
+        result.setResult(jsonObj);
+
+        result.setSuccess(true);
         return result;
     }
 

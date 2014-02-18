@@ -1,4 +1,4 @@
-package com.kongur.monolith.im.weixin.service;
+package com.kongur.monolith.im.weixin.service.message;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 import org.dom4j.DocumentException;
 import org.springframework.stereotype.Service;
 
-import com.kongur.monolith.im.domain.Message;
-import com.kongur.monolith.im.serivce.MessageBuilder;
+import com.kongur.monolith.im.domain.message.Message;
+import com.kongur.monolith.im.serivce.message.MessageBuilder;
 import com.kongur.monolith.im.utils.XmlTools;
 import com.kongur.monolith.im.weixin.domain.message.DefaultMessage;
 import com.kongur.monolith.im.weixin.domain.message.DeveloperValidateMessage;

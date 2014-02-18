@@ -1,6 +1,6 @@
 package com.kongur.monolith.im.weixin.domain.message;
 
-import com.kongur.monolith.im.domain.AbstractMessage;
+import com.kongur.monolith.im.domain.message.AbstractMessage;
 
 /**
  * 开发者认证消息

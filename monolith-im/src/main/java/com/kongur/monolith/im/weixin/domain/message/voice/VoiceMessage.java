@@ -1,6 +1,6 @@
-package com.kongur.monolith.im.weixin.domain.message;
+package com.kongur.monolith.im.weixin.domain.message.voice;
 
-import com.kongur.monolith.im.domain.AbstractMessage;
+import com.kongur.monolith.im.domain.message.AbstractMessage;
 
 
 /**

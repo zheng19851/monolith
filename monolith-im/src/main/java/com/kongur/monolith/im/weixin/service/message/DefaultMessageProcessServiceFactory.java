@@ -1,4 +1,4 @@
-package com.kongur.monolith.im.weixin.service;
+package com.kongur.monolith.im.weixin.service.message;
 
 import java.util.Map;
 
@@ -6,9 +6,9 @@ import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 
-import com.kongur.monolith.im.domain.Message;
-import com.kongur.monolith.im.serivce.MessageProcessService;
-import com.kongur.monolith.im.serivce.MessageProcessServiceFactory;
+import com.kongur.monolith.im.domain.message.Message;
+import com.kongur.monolith.im.serivce.message.MessageProcessService;
+import com.kongur.monolith.im.serivce.message.MessageProcessServiceFactory;
 
 /**
  * 微信 消息处理服务创建工厂

@@ -2,6 +2,8 @@ package com.kongur.monolith.im.serivce;
 
 import java.util.Map;
 
+import net.sf.json.JSONObject;
+
 import com.kongur.monolith.im.domain.ServiceResult;
 
 /**
@@ -18,7 +20,7 @@ public interface ApiService {
      * @param apiUrl 请求 api URL
      * @return
      */
-    ServiceResult<String> executeGet(String apiUrl) throws ExecuteException;
+    ServiceResult<String> executeGet(String apiUrl) throws ApiException;
 
     /**
      * 发起get请求
@@ -27,7 +29,7 @@ public interface ApiService {
      * @param getParams get请求参数
      * @return
      */
-    ServiceResult<String> executeGet(String apiUrl, Map<String, String> getParams) throws ExecuteException;
+    ServiceResult<String> executeGet(String apiUrl, Map<String, String> getParams) throws ApiException;
 
     /**
      * 发起post请求
@@ -36,5 +38,33 @@ public interface ApiService {
      * @param postParams post参数
      * @return
      */
-    ServiceResult<String> executePost(String apiUrl, String postParams) throws ExecuteException;
+    ServiceResult<String> executePost(String apiUrl, String postParams) throws ApiException;
+
+    /**
+     * 发起get请求，返回结果为JSONObject
+     * 
+     * @param apiUrl
+     * @return
+     * @throws ApiException
+     */
+    ServiceResult<JSONObject> doGet(String apiUrl) throws ApiException;
+
+    /**
+     * 发起get请求，返回结果为JSONObject
+     * 
+     * @param apiUrl 请求 api URL
+     * @param getParams get请求参数
+     * @return
+     */
+    ServiceResult<JSONObject> doGet(String apiUrl, Map<String, String> getParams) throws ApiException;
+
+    /**
+     * 发起post请求，返回结果为JSONObject
+     * 
+     * @param apiUrl 请求 api URL
+     * @param postParams post参数
+     * @return
+     */
+    ServiceResult<JSONObject> doPost(String apiUrl, String postParams) throws ApiException;
+
 }

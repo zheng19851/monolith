@@ -2,7 +2,7 @@ package com.kongur.monolith.im.weixin.domain.message;
 
 import java.util.Map;
 
-import com.kongur.monolith.im.domain.AbstractMessage;
+import com.kongur.monolith.im.domain.message.AbstractMessage;
 
 /**
  * 默认的消息对象

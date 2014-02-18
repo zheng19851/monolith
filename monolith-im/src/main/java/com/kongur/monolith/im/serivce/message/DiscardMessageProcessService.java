@@ -1,9 +1,9 @@
-package com.kongur.monolith.im.serivce;
+package com.kongur.monolith.im.serivce.message;
 
 import org.springframework.stereotype.Service;
 
-import com.kongur.monolith.im.domain.Message;
 import com.kongur.monolith.im.domain.ServiceResult;
+import com.kongur.monolith.im.domain.message.Message;
 
 /**
  * 当找不到指定的消息处理服务时，就会调用这个服务

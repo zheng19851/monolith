@@ -1,8 +1,8 @@
-package com.kongur.monolith.im.serivce;
+package com.kongur.monolith.im.serivce.message;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.kongur.monolith.im.domain.Message;
+import com.kongur.monolith.im.domain.message.Message;
 
 
 /**

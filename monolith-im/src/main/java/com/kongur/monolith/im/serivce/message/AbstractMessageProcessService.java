@@ -1,11 +1,12 @@
-package com.kongur.monolith.im.serivce;
+package com.kongur.monolith.im.serivce.message;
 
 import javax.annotation.Resource;
 
 import org.apache.log4j.Logger;
 
-import com.kongur.monolith.im.domain.Message;
 import com.kongur.monolith.im.domain.ServiceResult;
+import com.kongur.monolith.im.domain.message.Message;
+import com.kongur.monolith.im.serivce.SignatureValidator;
 
 /**
  * @author zhengwei
