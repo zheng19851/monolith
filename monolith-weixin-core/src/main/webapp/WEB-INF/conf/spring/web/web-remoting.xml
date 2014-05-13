@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="GB2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="menuService-hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">
+    	<property name="service" ref="remoteMenuService"/>
+    	<property name="serviceInterface" value="com.kongur.monolith.weixin.core.service.RemoteMenuService"/>
+	</bean>
+   
+   
+</beans>

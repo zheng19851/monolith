@@ -1,0 +1,11 @@
+
+#if($result.isSuccess())
+	
+	refresh success, new access token:${result.result}
+
+#else	
+	
+	refresh error, errorCode=$!{result.resultCode}, errorInfo=$!{result.resultInfo}
+	
+#end
+	

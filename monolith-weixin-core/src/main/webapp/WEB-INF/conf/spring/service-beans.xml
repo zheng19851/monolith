@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="GB2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<context:component-scan base-package="com.kongur.monolith.weixin.core.service" />
+	<context:component-scan base-package="com.kongur.monolith.weixin.core.manager" />
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:/messages/message</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="cacheSeconds" value="5"></property>
+	</bean>
+
+	<bean id="ResourceConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>WEB-INF/conf/server.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	
+	<bean id="defaultMessageProcessServiceResolver" class="com.kongur.monolith.weixin.core.service.message.impl.DefaultMessageProcessServiceResolver" init-method="init">
+	    <property name="messageProcessServices">
+	        <list>
+	        	<ref bean="menuClickEventMessageProcessService"/>
+	            <ref bean="scanQRCodeScanMessageProcessService"/>
+	            <ref bean="scanQRCodeSubscribeMessageProcessService"/>
+	            <ref bean="subscribeMessageProcessService"/>
+	            <ref bean="developerValidateMessageProcessService"/>
+	            <ref bean="textMessageProcessService"/>
+	        </list>
+	    </property>
+	    <property name="defaultMessageProcessService" ref="discardMessageProcessService"></property>
+	</bean>
+	
+	
+	<bean id="textMessageProcessService" class="com.kongur.monolith.weixin.core.service.message.normal.TextMessageProcessService">
+		<property name="order" value="1"></property>
+	</bean>
+	
+	<bean id="scanQRCodeScanMessageProcessService" class="com.kongur.monolith.weixin.core.service.message.event.ScanQRCodeScanMessageProcessService">
+		<property name="order" value="21"></property>
+	</bean>
+	
+	<!-- 扫描订阅配置在普通订阅服务之前  -->
+	<bean id="scanQRCodeSubscribeMessageProcessService" class="com.kongur.monolith.weixin.core.service.message.event.ScanQRCodeSubscribeMessageProcessService">
+		<property name="order" value="23"></property>
+	</bean>
+	
+	<!-- 普通订阅 -->
+	<bean id="subscribeMessageProcessService" class="com.kongur.monolith.weixin.core.service.message.event.SubscribeMessageProcessService">
+		<property name="order" value="25"></property>
+	</bean>
+	
+	<bean id="menuClickEventMessageProcessService" class="com.kongur.monolith.weixin.core.service.message.event.MenuClickEventMessageProcessService">
+		<property name="order" value="27"></property>
+	</bean>
+	
+	<bean id="discardMessageProcessService" class="com.kongur.monolith.weixin.core.service.message.impl.DiscardMessageProcessService">
+		<property name="order" value="999999"></property><!-- 最低优先级 -->
+	</bean>
+	
+	
+	<!-- 回复用的 Velocity模板解析引擎 -->	
+	<bean id="messageVelocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="resourceLoaderPath" value="/WEB-INF/templates/"></property>
+		<property name="velocityProperties">
+			<map>
+				<entry key="input.encoding" value="${vm.file.encoding}"></entry>
+				<entry key="output.encoding" value="${web.encoding}"></entry>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- 
+	<bean id="defaultReplyMessageBuilderResolver" class="com.kongur.monolith.weixin.core.service.reply.DefaultReplyMessageBuilderResolver">
+		<property name="replyMessageBuilders">
+			<list>
+				<ref/>
+			</list>
+		</property>
+	</bean>
+	 -->
+	 
+	 <!-- 创建文本被动回复消息 -->
+	 <bean id="textReplyMessageBuilder" class="com.kongur.monolith.weixin.core.service.reply.unactive.TextReplyMessageBuilder">
+	 	<property name="velocityEngine" ref="messageVelocityEngine" />
+	 	<property name="template" value="reply/unactive/text.vm"></property>
+	 </bean>
+	 
+	  <bean id="newsReplyMessageBuilder" class="com.kongur.monolith.weixin.core.service.reply.unactive.NewsReplyMessageBuilder">
+	 	<property name="velocityEngine" ref="messageVelocityEngine" />
+	 	<property name="template" value="reply/unactive/news.vm"></property>
+	 </bean>
+	 
+	 
+	 <bean id="imageResourceReplyMessageBuilder" class="com.kongur.monolith.weixin.core.service.reply.unactive.ImageResourceReplyMessageBuilder">
+	 	<property name="velocityEngine" ref="messageVelocityEngine" />
+	 	<property name="template" value="reply/unactive/image.vm"></property>
+	 </bean>
+	 
+	 <bean id="voiceResourceReplyMessageBuilder" class="com.kongur.monolith.weixin.core.service.reply.unactive.VoiceResourceReplyMessageBuilder">
+	 	<property name="velocityEngine" ref="messageVelocityEngine" />
+	 	<property name="template" value="reply/unactive/voice.vm"></property>
+	 </bean>
+	 
+	 <bean id="propertyPlaceholderHelper" class="org.springframework.util.PropertyPlaceholderHelper">
+		<constructor-arg index="0" value="${"></constructor-arg>	
+		<constructor-arg index="1" value="}"></constructor-arg>	
+	 </bean>
+	 
+	
+</beans>

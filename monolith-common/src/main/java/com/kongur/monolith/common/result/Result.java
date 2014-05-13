@@ -7,7 +7,7 @@ import java.io.Serializable;
  * 
  * @author zhengwei
  */
-public class Result implements Serializable {
+public class Result<T> implements Serializable {
 
     /**
      * 
@@ -19,6 +19,11 @@ public class Result implements Serializable {
     private String            resultCode;
 
     private String            resultInfo;
+
+    /**
+     * ·µ»Ø½á¹û
+     */
+    private T                 result;
 
     public Result() {
 
@@ -62,6 +67,14 @@ public class Result implements Serializable {
 
     public void setResultInfo(String resultInfo) {
         this.resultInfo = resultInfo;
+    }
+
+    public T getResult() {
+        return result;
+    }
+
+    public void setResult(T result) {
+        this.result = result;
     }
 
 }

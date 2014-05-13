@@ -1,0 +1,17 @@
+<xml>
+	<ToUserName><![CDATA[$!{toUser}]]></ToUserName>
+	<FromUserName><![CDATA[$!{fromUser}]]></FromUserName>
+	<CreateTime>$!{createTime}</CreateTime>
+	<MsgType><![CDATA[news]]></MsgType>
+	<ArticleCount>$!{reply.getItemsCount()}</ArticleCount>
+	<Articles>
+		#foreach($item in $reply.items)
+		<item>
+			<Title><![CDATA[$!{item.title}]]></Title>
+			<Description><![CDATA[$!{item.description}]]></Description>
+			<PicUrl><![CDATA[$!{item.picUrl}]]></PicUrl>
+			<Url><![CDATA[$!{item.url}]]></Url>
+		</item>
+		#end
+	</Articles>
+</xml> 
