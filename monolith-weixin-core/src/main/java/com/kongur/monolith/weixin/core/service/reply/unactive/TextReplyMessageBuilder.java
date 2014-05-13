@@ -2,7 +2,7 @@ package com.kongur.monolith.weixin.core.service.reply.unactive;
 
 import java.util.Map;
 
-import com.kongur.monolith.weixin.core.domain.Reply;
+import com.kongur.monolith.weixin.common.domain.dto.Reply;
 import com.kongur.monolith.weixin.core.domain.message.Message;
 
 /**

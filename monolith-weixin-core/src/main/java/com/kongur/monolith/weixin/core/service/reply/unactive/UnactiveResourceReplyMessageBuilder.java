@@ -1,6 +1,6 @@
 package com.kongur.monolith.weixin.core.service.reply.unactive;
 
-import com.kongur.monolith.weixin.core.domain.Reply;
+import com.kongur.monolith.weixin.common.domain.dto.Reply;
 
 /**
  * 资源类型

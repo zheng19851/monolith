@@ -5,7 +5,8 @@ import java.util.List;
 
 import com.kongur.monolith.common.DomainBase;
 import com.kongur.monolith.lang.StringUtil;
-import com.kongur.monolith.weixin.core.domain.enums.EnumReplyType;
+import com.kongur.monolith.weixin.common.domain.dto.Reply;
+import com.kongur.monolith.weixin.common.domain.enums.EnumReplyType;
 
 /**
  * 主被动回复

@@ -19,6 +19,13 @@
 			<artifactId>monolith-common</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.kongur.monolith.weixin</groupId>
+			<artifactId>monolith-weixin-common</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>

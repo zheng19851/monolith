@@ -2,7 +2,7 @@ package com.kongur.monolith.weixin.core.service.message.event;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.kongur.monolith.weixin.core.domain.Reply;
+import com.kongur.monolith.weixin.common.domain.dto.Reply;
 import com.kongur.monolith.weixin.core.domain.ReplyDO;
 import com.kongur.monolith.weixin.core.domain.message.EnumEventType;
 import com.kongur.monolith.weixin.core.domain.message.Message;

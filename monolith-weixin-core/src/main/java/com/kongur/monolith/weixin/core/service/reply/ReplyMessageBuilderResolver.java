@@ -1,6 +1,6 @@
 package com.kongur.monolith.weixin.core.service.reply;
 
-import com.kongur.monolith.weixin.core.domain.Reply;
+import com.kongur.monolith.weixin.common.domain.dto.Reply;
 
 /**
  * 查找符合要求的处理服务

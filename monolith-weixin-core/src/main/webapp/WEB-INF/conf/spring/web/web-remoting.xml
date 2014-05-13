@@ -3,7 +3,7 @@
 <beans>
 	<bean id="menuService-hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">
     	<property name="service" ref="remoteMenuService"/>
-    	<property name="serviceInterface" value="com.kongur.monolith.weixin.core.service.RemoteMenuService"/>
+    	<property name="serviceInterface" value="com.kongur.monolith.weixin.common.service.RemoteMenuService"/>
 	</bean>
    
    

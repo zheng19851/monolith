@@ -6,8 +6,8 @@ import org.apache.log4j.Logger;
 
 import com.kongur.monolith.common.result.Result;
 import com.kongur.monolith.lang.StringUtil;
+import com.kongur.monolith.weixin.common.domain.dto.Reply;
 import com.kongur.monolith.weixin.core.common.Ordered;
-import com.kongur.monolith.weixin.core.domain.Reply;
 import com.kongur.monolith.weixin.core.domain.message.Message;
 import com.kongur.monolith.weixin.core.service.reply.ReplyMessageBuilder;
 import com.kongur.monolith.weixin.core.service.reply.ReplyMessageBuilderResolver;

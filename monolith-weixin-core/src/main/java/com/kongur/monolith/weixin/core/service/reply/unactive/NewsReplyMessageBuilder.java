@@ -3,8 +3,8 @@ package com.kongur.monolith.weixin.core.service.reply.unactive;
 import java.util.Map;
 
 import com.kongur.monolith.common.result.Result;
+import com.kongur.monolith.weixin.common.domain.enums.EnumReplyType;
 import com.kongur.monolith.weixin.core.domain.ReplyDO;
-import com.kongur.monolith.weixin.core.domain.enums.EnumReplyType;
 import com.kongur.monolith.weixin.core.domain.message.Message;
 
 /**
