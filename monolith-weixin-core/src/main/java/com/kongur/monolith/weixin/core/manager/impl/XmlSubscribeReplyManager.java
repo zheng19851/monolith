@@ -155,9 +155,14 @@ public class XmlSubscribeReplyManager implements SubscribeReplyManager {
 
         // 将之前的信息提交上来的话，就清理掉
         if (reply.isResource()) {
+            reply.setItems(null);
             reply.setContent(null);
-        } else {
+        } else if (reply.isNews()) {
+            reply.setContent(null);
             reply.setResourceId(null);
+        } else if (reply.isText()) {
+            reply.setResourceId(null);
+            reply.setItems(null);
         }
 
         WriteLock writeLock = readWriteLock.writeLock();

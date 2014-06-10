@@ -58,6 +58,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
         int len = req.getContentLength();
 
         if (len <= 0) {
+            log.error("can not find any content in the request. len=" + len);
             return null;
         }
 
@@ -73,7 +74,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
             }
 
         } catch (IOException e) {
-            log.error("read receivedMsg error", e);
+            log.error("read receivedMsg error, req=" + req, e);
             return null;
         }
 
@@ -90,7 +91,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
         } else {
             String receivedMsg = readMsg(req);// 接收到的消息
             if (StringUtil.isBlank(receivedMsg)) {
-                log.error("can not read receivedMsg from request.");
+                log.error("can not read receivedMsg from the request. req=" + req);
                 return msg;
             }
 
@@ -98,7 +99,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
             try {
                 params = XmlTools.toMap(receivedMsg);
             } catch (DocumentException e) {
-                log.error("xml datas convert to Map error", e);
+                log.error("xml datas convert to Map error, receivedMsg=" + receivedMsg, e);
                 return msg;
             }
 

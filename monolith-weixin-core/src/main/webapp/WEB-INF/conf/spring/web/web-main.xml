@@ -147,6 +147,7 @@
 		<property name="urlMap">
 			<map>
                 <entry key="/remoting/hessian/menuService.htm" value-ref="menuService-hessian" />
+                <entry key="/remoting/hessian/subscribeReplyService.htm" value-ref="subscribeReplyService-hessian" />
 			</map>
 		</property>
 	</bean>

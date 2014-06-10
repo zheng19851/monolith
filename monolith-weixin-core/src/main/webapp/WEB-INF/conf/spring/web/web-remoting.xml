@@ -6,5 +6,9 @@
     	<property name="serviceInterface" value="com.kongur.monolith.weixin.common.service.RemoteMenuService"/>
 	</bean>
    
+   <bean id="subscribeReplyService-hessian" class="org.springframework.remoting.caucho.HessianServiceExporter">
+    	<property name="service" ref="remoteSubscribeReplyService"/>
+    	<property name="serviceInterface" value="com.kongur.monolith.weixin.common.service.RemoteSubscribeReplyService"/>
+	</bean>
    
 </beans>

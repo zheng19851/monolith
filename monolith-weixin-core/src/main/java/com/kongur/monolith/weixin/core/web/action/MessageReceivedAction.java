@@ -49,11 +49,11 @@ public class MessageReceivedAction {
      */
     @RequestMapping("message.htm")
     @ResponseBody
-    public String messageReceived(@RequestParam(value = "signature", required = false)
-    String signature, @RequestParam(value = "timestamp", required = false)
-    String timestamp, @RequestParam(value = "nonce", required = false)
-    String nonce, @RequestParam(value = "echostr", required = false)
-    String echostr, HttpServletRequest req) {
+    public String messageReceived(@RequestParam(value = "signature", required = false) String signature,
+                                  @RequestParam(value = "timestamp", required = false) String timestamp,
+                                  @RequestParam(value = "nonce", required = false) String nonce,
+                                  @RequestParam(value = "echostr", required = false) String echostr,
+                                  HttpServletRequest req) {
 
         if (log.isInfoEnabled()) {
             log.info("==============================message received==================================");
@@ -74,21 +74,22 @@ public class MessageReceivedAction {
 
         Message msg = messageBuilder.build(signature, timestamp, nonce, echostr, req);
         if (!msg.isValid()) {
-            log.error("=============can not build valid message=============");
+            log.error("=============can not build valid message=============, msg=" + msg);
             return null;
         }
 
         MessageProcessService<Message> messageProcessService = messageProcessServiceResolver.resolve(msg);
 
         if (messageProcessService == null) {
-            log.error("=============can not resolve MessageProcessService=============");
+            log.error("=============can not resolve MessageProcessService=============, msg=" + msg);
             return null;
         }
 
         Result<String> result = messageProcessService.process(msg);
 
         if (!result.isSuccess()) {
-            log.error("=============process message error=============, errorInfo=" + result.getResultInfo());
+            log.error("=============process message error=============, errorInfo=" + result.getResultInfo() + ", msg="
+                      + msg);
             return null;
         }
 
