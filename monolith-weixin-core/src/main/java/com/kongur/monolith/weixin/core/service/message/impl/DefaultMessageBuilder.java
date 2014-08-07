@@ -21,6 +21,7 @@ import com.kongur.monolith.weixin.core.domain.message.event.LocationEventMessage
 import com.kongur.monolith.weixin.core.domain.message.event.ScanQRCodeEventMessage;
 import com.kongur.monolith.weixin.core.domain.message.event.SubscribeEventMessage;
 import com.kongur.monolith.weixin.core.domain.message.event.UnsubscribeEventMessage;
+import com.kongur.monolith.weixin.core.domain.message.event.ViewEventMessage;
 import com.kongur.monolith.weixin.core.domain.message.normal.ImageMessage;
 import com.kongur.monolith.weixin.core.domain.message.normal.LinkMessage;
 import com.kongur.monolith.weixin.core.domain.message.normal.LocationMessage;
@@ -144,6 +145,8 @@ public class DefaultMessageBuilder implements MessageBuilder {
                     msg = new LocationEventMessage(signature, timestamp, nonce, params);
                 } else if (EnumEventType.isClick(eventType)) {
                     msg = new ClickEventMessage(signature, timestamp, nonce, params);
+                } else if (EnumEventType.isView(eventType)) {
+                    msg = new ViewEventMessage(signature, timestamp, nonce, params);
                 }
 
             } else {

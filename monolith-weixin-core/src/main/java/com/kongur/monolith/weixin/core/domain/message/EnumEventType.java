@@ -16,7 +16,9 @@ public enum EnumEventType {
 
     LOCATION("LOCATION", "上报地理位置事件"),
 
-    CLICK("CLICK", "自定义菜单事件")
+    CLICK("CLICK", "点击菜单拉取消息时的事件"),
+
+    VIEW("VIEW", "点击菜单跳转链接时的事件"),
 
     ;
 
@@ -89,6 +91,16 @@ public enum EnumEventType {
      */
     public static boolean isClick(String eventType) {
         return CLICK.getValue().equalsIgnoreCase(eventType);
+    }
+
+    /**
+     * 点击菜单跳转链接时的事件推送
+     * 
+     * @param eventType
+     * @return
+     */
+    public static boolean isView(String eventType) {
+        return VIEW.getValue().equalsIgnoreCase(eventType);
     }
 
     /**
