@@ -1,0 +1,29 @@
+<rules>
+	<rule>
+		<sqlId>message.selectMessage</sqlId>
+		<dataSourceId>db1</dataSourceId>
+	</rule>
+	<!-- 
+	<rule>
+		<namespace>message</namespace>
+		<dataSourceId>db1</dataSourceId>
+	</rule>
+	 -->
+	<rule>
+		<sqlId>message.selectMessage</sqlId>
+		<expression><![CDATA[msgId.startsWith("D")]]></expression>
+		<dataSourceId>db1</dataSourceId>
+	</rule>
+	
+	<rule>
+		<namespace>USER</namespace>
+		<expression><![CDATA[mod.apply(id)==0]]></expression>
+		<dataSourceId>db1</dataSourceId>
+	</rule>
+	
+	<rule>
+		<namespace>USER</namespace>
+		<expression><![CDATA[mod.apply(id, 4)==2]]></expression>
+		<dataSourceId>db2</dataSourceId>
+	</rule>
+</rules>

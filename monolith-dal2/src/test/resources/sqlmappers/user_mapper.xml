@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+     
+<mapper namespace="USER">
+   
+	<resultMap id="UserResultMap" type="UserDOAlias">
+		<id column="id" property="id" />
+		<result column="app_id" property="appId" />
+		<result column="msg_id" property="msgId" />
+		<result column="msg_type" property="msgType" />
+		<result column="from_user" property="fromUser" />
+		<result column="to_user" property="toUser" />
+		<result column="create_time" property="createTime" />
+		<result column="features" property="features" />
+		<result column="status" property="status" />
+		<result column="gmt_create" property="gmtCreate" />
+		<result column="gmt_modify" property="gmtModify" />
+	</resultMap>
+
+	<sql id="WXMessage-columns-without-id">
+		app_id, msg_id, msg_type, from_user, to_user, create_time, features, status, gmt_create, gmt_modify
+	</sql>
+
+	<insert id="USER.insertMessage"  parameterType="UserDOAlias">
+		INSERT INTO wx_message(<include refid="WXMessage-columns-without-id" />)
+		VALUES(#{appId}, #{msgId}, #{msgType}, #{fromUser}, #{toUser}, #{createTime}, #{features}, #{status}, now(), now())
+		<selectKey resultType="long" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+   	
+  	<select id="USER.selectById" resultMap="UserResultMap" >
+		SELECT  id, <include refid="WXMessage-columns-without-id"/> FROM wx_message where id = #{id}
+  	</select>
+
+
+  	
+</mapper>
+ 
+ 

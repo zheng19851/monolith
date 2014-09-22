@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="GB2312"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
+	default-lazy-init="false">
+	
+	<bean id="ResourceConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:server.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="db1" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="1" />
+		<property name="maxIdle" value="2" />
+		<property name="minIdle" value="1" />
+		<property name="maxActive" value="${jdbc.maxActive}" />
+		<property name="maxWait" value="${jdbc.maxWait}" />
+		<property name="testWhileIdle" value="true" />
+		<property name="validationQuery" value="select 1 from dual" />
+		<!--<property name="poolPreparedStatements" value="true" /> -->
+		<property name="defaultAutoCommit" value="true" />
+	</bean>
+	
+	<bean id="dataSourceManager" class="com.kongur.monolith.dal.datasource.DefaultDataSourceManager">
+		<property name="dataSourceDescriptors" >
+			<set>
+				<bean class="com.kongur.monolith.dal.datasource.DataSourceDescriptor">
+					<property name="identity" value="db1"/>
+					<property name="masterDataSource" ref="db1"/>
+					<property name="masterDetectorDataSource" ref="db1"/>
+					<!-- 
+					<property name="slaveDataSource" ref="db2"/>
+					<property name="slaveDetectorDataSource" ref="db2"/>
+					 -->
+				</bean>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="defaultRouteRulesManager" class="com.kongur.monolith.dal.route.conf.DefaultRouteRulesManager">
+		<property name="configLocation" value="classpath:rules.xml" />
+		<property name="functions">
+			<map>
+				<entry key="mod">
+					<bean class="com.kongur.monolith.dal.route.rule.func.ModFunction">
+						<constructor-arg>
+							<value>4</value>
+						</constructor-arg>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="router" class="com.kongur.monolith.dal.route.DefaultDataSourceRouter">
+		<property name="routeRulesManager" ref="defaultRouteRulesManager" />
+		<property name="dataSourceManager" ref="dataSourceManager" />
+	</bean>
+
+	<bean id="sqlSessionFactory" class="com.kongur.monolith.dal.MyBatisSqlSessionFactoryBean"><!-- org.mybatis.spring.SqlSessionFactoryBean -->
+	  <property name="dataSource" ref="db1"/>
+	  <property name="configLocation" value="classpath:sql-mappers-config.xml"/>
+	  <property name="mapperLocations" value="classpath:sqlmappers/**/*_mapper.xml" />
+	  <property name="router" ref="router" />
+	  <property name="transactionFactory">
+	  		<bean class="com.kongur.monolith.dal.transaction.SpringManagedTransactionFactory"></bean>
+	  </property>
+	</bean>
+
+</beans>
