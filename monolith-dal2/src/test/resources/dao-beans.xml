@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
 	default-lazy-init="false" default-autowire="byName">
 	
-	<bean id="userDAO" class="com.kongur.monolith.dal.test.dao.impl.UserDAOImpl">
+	<bean id="userDAO" class="com.runssnail.monolith.dal.test.dao.impl.UserDAOImpl">
 	</bean>
 
 </beans>

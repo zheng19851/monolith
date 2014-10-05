@@ -12,7 +12,7 @@
     </settings>
     
     <typeAliases>
-    	<typeAlias alias="UserDOAlias" type="com.kongur.monolith.dal.test.domain.UserDO"/>
+    	<typeAlias alias="UserDOAlias" type="com.runssnail.monolith.dal.test.domain.UserDO"/>
     </typeAliases>
     
     <!-- 
