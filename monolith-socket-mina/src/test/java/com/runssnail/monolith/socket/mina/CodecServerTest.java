@@ -12,8 +12,8 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
-import com.kongur.monolith.socket.mina.DefaultProtocolCodecFactory;
 import com.runssnail.monolith.socket.message.codec.DefaultMessageCodecFactory;
+import com.runssnail.monolith.socket.mina.DefaultProtocolCodecFactory;
 
 
 

@@ -1,9 +1,9 @@
 package com.runssnail.monolith.socket.mina;
 
-import com.kongur.monolith.socket.mina.AbstractProtocolDecoder;
 import com.runssnail.monolith.socket.message.DownstreamMessage;
 import com.runssnail.monolith.socket.message.UpstreamMessage;
 import com.runssnail.monolith.socket.message.codec.MessageCodecFactory;
+import com.runssnail.monolith.socket.mina.AbstractProtocolDecoder;
 import com.runssnail.monolith.socket.protocol.ProtocolParser;
 
 /**
