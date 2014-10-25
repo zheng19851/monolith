@@ -33,11 +33,11 @@
 		<property name="defaultAutoCommit" value="true" />
 	</bean>
 
-<bean id="monoDataSourceService" class="com.kongur.monolith.dal.datasources.DefaultMonoDataSourceService">
+<bean id="monoDataSourceService" class="com.runssnail.monolith.dal.datasources.DefaultMonoDataSourceService">
 	<property name="dataSourceDescriptors">
 		<set>
-			<bean class="com.kongur.monolith.dal.datasources.MonoDataSourceDescriptor"><!-- com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor -->
-				<property name="identity" value="kongur1"/>
+			<bean class="com.runssnail.monolith.dal.datasources.MonoDataSourceDescriptor"><!-- com.alibaba.cobar.client.datasources.CobarDataSourceDescriptor -->
+				<property name="identity" value="runssnail1"/>
 				<property name="targetDataSource" ref="dataSource"/>
 				<!-- 
 				<property name="targetDetectorDataSource" ref="dataSource"/>
@@ -112,16 +112,16 @@
 	</bean>
 	
 	<!-- 路由规则配置-->
-<bean id="internalRouter" class="com.kongur.monolith.dal.router.config.MonoRouterXmlFactoryBean">
+<bean id="internalRouter" class="com.runssnail.monolith.dal.router.config.MonoRouterXmlFactoryBean">
 	<property name="functionsMap">
 		<map>
 			<entry key="mod">
-				<bean class="com.kongur.monolith.dal.router.function.ModFunction">
+				<bean class="com.runssnail.monolith.dal.router.function.ModFunction">
 					<constructor-arg><value>2</value></constructor-arg>
 				</bean>
 			</entry>
 			<entry key="hashing">
-				<bean class="com.kongur.monolith.dal.router.function.HashingFunction">
+				<bean class="com.runssnail.monolith.dal.router.function.HashingFunction">
 				</bean>
 			</entry>
 			
@@ -140,7 +140,7 @@
 </bean>
 	
 
-	<bean id="sqlMapClientTemplate" class="com.kongur.monolith.dal.MonoSqlMapClientTemplate">
+	<bean id="sqlMapClientTemplate" class="com.runssnail.monolith.dal.MonoSqlMapClientTemplate">
 		<property name="sqlMapClient" ref="sqlMapClient" />
 		<property name="monoDataSourceService" ref="monoDataSourceService" />
 		<property name="router" ref="internalRouter" />

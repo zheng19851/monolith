@@ -8,7 +8,7 @@
            
 	
 	
-	<bean id="monoHttpSessionFilterBean" class="com.kongur.monolith.session.MonoHttpSessionFilter">
+	<bean id="monoHttpSessionFilterBean" class="com.runssnail.monolith.session.MonoHttpSessionFilter">
 		<property name="attributesConfigManager" ref="attributesConfigManager" />
 	</bean>
 

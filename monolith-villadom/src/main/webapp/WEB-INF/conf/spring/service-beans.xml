@@ -6,13 +6,13 @@
            http://www.springframework.org/schema/context
            http://www.springframework.org/schema/context/spring-context-3.0.xsd">
            
-	<context:component-scan base-package="com.kongur.monolith.villadom.service" />
+	<context:component-scan base-package="com.runssnail.monolith.villadom.service" />
 	 
-	<bean id="attributesConfigManager" class="com.kongur.monolith.session.attibute.DefaultAttributesConfigManager" init-method="init">
+	<bean id="attributesConfigManager" class="com.runssnail.monolith.session.attibute.DefaultAttributesConfigManager" init-method="init">
 	    <property name="attributeConfigs">
 	        <map>
 	            <entry key="userName">
-	                <bean class="com.kongur.monolith.session.attibute.AttributeConfigDO">
+	                <bean class="com.runssnail.monolith.session.attibute.AttributeConfigDO">
 	                    <property name="key" value="userName"></property>
 	                    <property name="clientKey" value="_u_"></property>
 	                </bean>
