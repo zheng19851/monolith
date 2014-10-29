@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="GBK"?>
+<xsd:schema xmlns="http://momo.runssnail.com/schema/momo"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://momo.runssnail.com/schema/momo"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[ Namespace support for the momo. ]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="service">
+		<xsd:annotation>
+			<xsd:documentation>service customer config </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional" />
+			<xsd:attribute name="name" type="xsd:string" use="optional" />
+			<xsd:attribute name="serviceInterface" type="xsd:string" use="required" />
+			<xsd:attribute name="version" type="xsd:string" use="optional" default="1.0" />
+			<xsd:attribute name="protocol" use="optional" default="hessian">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="hessian" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="host" type="xsd:string" use="optional" default="localhost" />
+			<xsd:attribute name="port" type="xsd:integer" use="optional" default="8080" />
+			<xsd:attribute name="contextPath" type="xsd:string" use="optional" default="/" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="exporter">
+		<xsd:annotation>
+			<xsd:documentation>exporter service config </xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="id" type="xsd:ID" use="optional" />
+			<xsd:attribute name="name" type="xsd:string" use="optional" />
+			<xsd:attribute name="serviceInterface" type="xsd:string" use="required" />
+			<xsd:attribute name="serviceRef" type="xsd:string" use="required" />
+			<xsd:attribute name="version" type="xsd:string" use="optional" default="1.0" />
+			<xsd:attribute name="protocol" use="optional" default="hessian">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="hessian" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="handlerMappingOrder" type="xsd:string" use="optional" default="10" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	
+</xsd:schema>
