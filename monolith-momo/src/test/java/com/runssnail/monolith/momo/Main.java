@@ -15,7 +15,8 @@ public class Main {
 
         TestService remoteTestService = (TestService) context.getBean("com.runssnail.monolith.momo.TestService");
 
-        remoteTestService.print();
+//        remoteTestService.print();
+        System.out.println(remoteTestService);
     }
 
 }

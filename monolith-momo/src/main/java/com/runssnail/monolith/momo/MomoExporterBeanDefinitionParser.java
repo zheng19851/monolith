@@ -2,14 +2,17 @@ package com.runssnail.monolith.momo;
 
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.remoting.caucho.HessianServiceExporter;
-import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
+
+import com.runssnail.monolith.momo.support.ExporterBeanDefinitionCreator;
+import com.runssnail.monolith.momo.support.ExporterBeanDefinitionFactory;
+import com.runssnail.monolith.momo.support.ExporterMetadata;
+import com.runssnail.monolith.momo.support.ExporterMetadataParser;
+import com.runssnail.monolith.momo.support.ExporterMetadataParserFactory;
 
 /**
  * 解析发布服务xml配置
@@ -23,16 +26,43 @@ public class MomoExporterBeanDefinitionParser extends AbstractMomoBeanDefinition
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
 
-        String orderStr = element.getAttribute("handlerMappingOrder");
-
         BeanDefinitionRegistry registry = parserContext.getRegistry();
+
+        checkDefaultHandlerMapping(element, registry);
+
+        String protocol = element.getAttribute("protocol");
+
+        ExporterMetadataParser parser = ExporterMetadataParserFactory.getExporterMetadataParser(protocol);
+
+        ExporterMetadata exporterMetadata = parser.parse(element, parserContext);
+
+        ExporterBeanDefinitionCreator exporterBeanDefinitionCreator = ExporterBeanDefinitionFactory.getExporterBeanDefinitionCreator(protocol);
+
+        BeanDefinitionHolder holder = exporterBeanDefinitionCreator.createBeanDefinitionHolder(exporterMetadata);
+
+        BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
+
+        if (log.isDebugEnabled()) {
+            log.debug("export service success, serviceName=" + exporterMetadata.getServiceName());
+        }
+
+        return holder.getBeanDefinition();
+    }
+
+    private void checkDefaultHandlerMapping(Element element, BeanDefinitionRegistry registry) {
+
+        String orderStr = element.getAttribute("handlerMappingOrder");
 
         if (registry.containsBeanDefinition(DEFAULT_HANDLER_MAPPING)) {
             BeanDefinition handlerMappingBeanDefinition = registry.getBeanDefinition(DEFAULT_HANDLER_MAPPING);
-            log.warn("the '" + DEFAULT_HANDLER_MAPPING + "' has exists");
+            if (log.isDebugEnabled()) {
+                log.debug("the '" + DEFAULT_HANDLER_MAPPING + "' has exists");
+            }
             handlerMappingBeanDefinition.getPropertyValues().add("order", orderStr);
         } else {
-            log.warn("can not find '" + DEFAULT_HANDLER_MAPPING + "'");
+            if (log.isDebugEnabled()) {
+                log.debug("can not find '" + DEFAULT_HANDLER_MAPPING + "'");
+            }
             synchronized (DEFAULT_HANDLER_MAPPING) {
                 if (!registry.containsBeanDefinition(DEFAULT_HANDLER_MAPPING)) {
                     BeanDefinition handlerMappingBeanDefinition = new RootBeanDefinition();
@@ -40,40 +70,14 @@ public class MomoExporterBeanDefinitionParser extends AbstractMomoBeanDefinition
                     handlerMappingBeanDefinition.getPropertyValues().add("order", orderStr);
 
                     registry.registerBeanDefinition(DEFAULT_HANDLER_MAPPING, handlerMappingBeanDefinition);
-                    log.warn("register '" + DEFAULT_HANDLER_MAPPING + "' success");
+                    if (log.isDebugEnabled()) {
+                        log.debug("register '" + DEFAULT_HANDLER_MAPPING + "' success");
+                    }
                 }
             }
 
         }
 
-        String service = element.getAttribute("serviceRef");
-
-        String serviceInterface = element.getAttribute("serviceInterface");
-
-        String protocol = element.getAttribute("protocol");
-
-        String version = element.getAttribute("version");
-
-        String id = element.getAttribute("id");
-
-        // 服务名称
-        String name = element.getAttribute("name");
-
-        String serviceName = buildServiceName(name, protocol, version, serviceInterface);
-
-        RootBeanDefinition bd = new RootBeanDefinition();
-        bd.setBeanClass(HessianServiceExporter.class);
-        bd.getPropertyValues().add("service", new RuntimeBeanReference(service));
-        bd.getPropertyValues().add("serviceInterface", serviceInterface);
-
-        String[] aliases = null;
-        if (StringUtils.hasText(id)) {
-            aliases = new String[] { id };
-        }
-        BeanDefinitionHolder holder = new BeanDefinitionHolder(bd, serviceName, aliases);
-
-        BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
-
-        return bd;
     }
+
 }

@@ -1,6 +1,6 @@
 
 /**
- * 默认用hessian实现的简单的服务框架
+ * 默认用spring + hessian实现的简单的服务工具包
  * 
  * @author zhengwei
  */
