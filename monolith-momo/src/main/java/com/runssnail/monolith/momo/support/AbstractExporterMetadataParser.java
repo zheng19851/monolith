@@ -7,12 +7,7 @@ import org.w3c.dom.Element;
 
 public abstract class AbstractExporterMetadataParser extends MetadataParser implements ExporterMetadataParser {
 
-    private static final String SERVICE_NAME                = "serviceName";
-    
-    @Override
-    public ExporterMetadata parse(Element element, ParserContext parserContext) {
-        return null;
-    }
+    private static final String SERVICE_NAME = "serviceName";
 
     protected String getServiceName(ParserContext parserContext, List<Element> childElts) {
         Element serviceNameEle = getServiceNameEle(parserContext, childElts);

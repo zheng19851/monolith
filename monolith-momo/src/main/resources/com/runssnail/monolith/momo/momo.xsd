@@ -27,6 +27,8 @@
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
 						<xsd:enumeration value="hessian" />
+						<xsd:enumeration value="xfire" />
+						<xsd:enumeration value="httpInvoker" />
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>
@@ -59,6 +61,8 @@
 				<xsd:simpleType>
 					<xsd:restriction base="xsd:string">
 						<xsd:enumeration value="hessian" />
+						<xsd:enumeration value="xfire" />
+						<xsd:enumeration value="httpInvoker" />
 					</xsd:restriction>
 				</xsd:simpleType>
 			</xsd:attribute>

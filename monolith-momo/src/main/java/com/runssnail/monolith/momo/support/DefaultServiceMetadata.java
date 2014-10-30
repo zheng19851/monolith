@@ -5,7 +5,7 @@ package com.runssnail.monolith.momo.support;
  *
  * @author zhengwei
  */
-public class CommonServiceMetadata extends AbstractMetadata implements ServiceMetadata {
+public class DefaultServiceMetadata extends AbstractMetadata implements ServiceMetadata {
 
     // private String connectTimeout ;
 

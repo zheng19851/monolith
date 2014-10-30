@@ -1,6 +1,6 @@
 package com.runssnail.monolith.momo.support.hessian;
 
-import com.runssnail.monolith.momo.support.CommonExporterMetadata;
+import com.runssnail.monolith.momo.support.DefaultExporterMetadata;
 
 /**
  * hessian 协议， 服务端元数据描述
@@ -8,6 +8,6 @@ import com.runssnail.monolith.momo.support.CommonExporterMetadata;
  * @author zhengwei
  *
  */
-public class HessianExporterMetadata extends CommonExporterMetadata {
+public class HessianExporterMetadata extends DefaultExporterMetadata {
 
 }

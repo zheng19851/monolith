@@ -8,6 +8,10 @@ public class ServiceMetadataParserFactory {
         ServiceMetadataParser parser = null;
         if (EnumProtocol.isHessian(protocol)) {
             parser = HessianServiceMetadataParser.getInstance();
+        } else if (EnumProtocol.isXfire(protocol) || EnumProtocol.isHttpInvoker(protocol)) {
+            parser = DefaultServiceMetadataParser.getInstance();
+        } else {
+            throw new RuntimeException("can not find 'ServiceMetadataParser', protocol=" + protocol);
         }
 
         return parser;

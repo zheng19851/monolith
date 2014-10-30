@@ -5,7 +5,7 @@ package com.runssnail.monolith.momo.support;
  * 
  * @author zhengwei
  */
-public class CommonExporterMetadata extends AbstractMetadata implements ExporterMetadata {
+public class DefaultExporterMetadata extends AbstractMetadata implements ExporterMetadata {
 
     /**
      * 服务引用

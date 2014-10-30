@@ -7,7 +7,7 @@ package com.runssnail.monolith.momo.support;
  */
 public enum EnumProtocol {
 
-    HESSIAN("hessian"), XFIRE("xfire");
+    HESSIAN("hessian"), XFIRE("xfire"), HTTP_INVOKER("httpInvoker");
 
     private String name;
 
@@ -25,6 +25,14 @@ public enum EnumProtocol {
 
     public static boolean isHessian(String protocol) {
         return HESSIAN.getName().equalsIgnoreCase(protocol);
+    }
+
+    public static boolean isXfire(String protocol) {
+        return XFIRE.getName().equalsIgnoreCase(protocol);
+    }
+
+    public static boolean isHttpInvoker(String protocol) {
+        return HTTP_INVOKER.getName().equalsIgnoreCase(protocol);
     }
 
 }
