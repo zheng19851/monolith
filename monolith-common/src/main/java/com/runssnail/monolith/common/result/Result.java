@@ -1,13 +1,13 @@
 package com.runssnail.monolith.common.result;
 
-import java.io.Serializable;
+import com.runssnail.monolith.common.DomainBase;
 
 /**
  * 通用结果
  * 
  * @author zhengwei
  */
-public class Result<T> implements Serializable {
+public class Result<T> extends DomainBase {
 
     /**
      * 
@@ -39,42 +39,47 @@ public class Result<T> implements Serializable {
         this.success = success;
     }
 
-    public void setError(String resultCode, String resultInfo) {
+    public Result<T> setError(String resultCode, String resultInfo) {
         this.resultCode = resultCode;
         this.resultInfo = resultInfo;
         this.success = false;
+        return this;
     }
 
     public boolean isSuccess() {
         return success;
     }
 
-    public void setSuccess(boolean success) {
+    public Result<T> setSuccess(boolean success) {
         this.success = success;
+        return this;
     }
 
     public String getResultCode() {
         return resultCode;
     }
 
-    public void setResultCode(String resultCode) {
+    public Result<T> setResultCode(String resultCode) {
         this.resultCode = resultCode;
+        return this;
     }
 
     public String getResultInfo() {
         return resultInfo;
     }
 
-    public void setResultInfo(String resultInfo) {
+    public Result<T> setResultInfo(String resultInfo) {
         this.resultInfo = resultInfo;
+        return this;
     }
 
     public T getResult() {
         return result;
     }
 
-    public void setResult(T result) {
+    public Result<T> setResult(T result) {
         this.result = result;
+        return this;
     }
 
 }
