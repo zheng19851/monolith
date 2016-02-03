@@ -1,12 +1,14 @@
 package com.runssnail.monolith.session.attibute;
 
+import org.apache.log4j.Logger;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 /**
+ * abstract AttributesConfigManager
+ *
  * @author zhengwei
  */
 public abstract class AbstractAttributesConfigManager implements AttributesConfigManager {

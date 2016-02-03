@@ -4,6 +4,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.runssnail.monolith.session.store.CookieSessionAttributeStore;
 
+import java.io.Serializable;
+
 /**
  * cookie配置信息
  * 
@@ -11,7 +13,9 @@ import com.runssnail.monolith.session.store.CookieSessionAttributeStore;
  * @date：2011-6-15
  */
 
-public class AttributeConfigDO {
+public class AttributeConfigDO implements Serializable {
+
+    private static final long serialVersionUID = 3190254383299004162L;
 
     /**
      * 程序中使用的属性的名字，对应于HttpSession.getAttribute()方法的参数

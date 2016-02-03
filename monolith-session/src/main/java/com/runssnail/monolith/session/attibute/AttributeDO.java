@@ -1,27 +1,31 @@
 package com.runssnail.monolith.session.attibute;
 
+import java.io.Serializable;
+
 /**
  * @author zhengwei
  * @date£º2011-6-15
  */
 
-public class AttributeDO {
+public class AttributeDO implements Serializable {
 
-    private AttributeConfigDO cookieConfigDO;
+    private static final long serialVersionUID = 5857808752611003260L;
+
+    private AttributeConfigDO attributeConfigDO;
 
     private String            value;
 
     public AttributeDO(AttributeConfigDO ac, String v) {
-        this.cookieConfigDO = ac;
+        this.attributeConfigDO = ac;
         this.value = v;
     }
 
     public AttributeConfigDO getAttributeConfigDO() {
-        return cookieConfigDO;
+        return attributeConfigDO;
     }
 
     public void setAttributeConfigDO(AttributeConfigDO cookieConfigDO) {
-        this.cookieConfigDO = cookieConfigDO;
+        this.attributeConfigDO = cookieConfigDO;
     }
 
     public String getValue() {
@@ -32,4 +36,11 @@ public class AttributeDO {
         this.value = value;
     }
 
+    @Override
+    public String toString() {
+        return "AttributeDO{" +
+                "attributeConfigDO=" + attributeConfigDO +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

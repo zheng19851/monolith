@@ -1,10 +1,9 @@
 package com.runssnail.monolith.session.attibute;
 
 /**
- * 默认的cookie配置管理器
+ * default AttributesConfigManager
  * 
  * @author zhengwei
- * @date：2011-6-15
  */
 
 public class DefaultAttributesConfigManager extends AbstractAttributesConfigManager {
