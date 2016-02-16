@@ -1,77 +1,73 @@
 package com.runssnail.monolith.session;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.runssnail.monolith.session.attibute.AttributeConfigDO;
+import com.runssnail.monolith.session.attibute.AttributesConfigManager;
+import com.runssnail.monolith.session.store.SessionAttributeStore;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
-
-import org.apache.log4j.Logger;
-
-import com.runssnail.monolith.session.attibute.AttributeConfigDO;
-import com.runssnail.monolith.session.attibute.AttributesConfigManager;
-import com.runssnail.monolith.session.store.SessionAttributeStore;
+import java.util.*;
 
 /**
  * mono http session 实现
- * 
+ *
  * @author zhengwei
  * @date：2011-6-15
  */
 
 public class MonoHttpSession implements HttpSession, Lifecycle {
 
-    private static final Logger                log                 = Logger.getLogger(MonoHttpSession.class);
+    private static final Log log = LogFactory.getLog(MonoHttpSession.class);
 
     /**
-     * 
+     *
      */
-    private MonoHttpServletRequest             request;
+    private MonoHttpServletRequest request;
 
-    private MonoHttpServletResponse            response;
+    private MonoHttpServletResponse response;
 
     /**
      * servlet 容器创建的session
      */
-    private HttpSession                        srcHttpSession;
+    private HttpSession session;
 
     /**
      * session 创建时间
      */
-    private long                               creationTime;
+    private long creationTime = System.currentTimeMillis();
+
+    private long lastAccessedTime = creationTime;
 
     /**
      * session失效时间，默认半个小时,单位：秒
      */
-    private int                                maxInactiveInterval = 1800;
+    private int maxInactiveInterval = 1800;
 
     /**
      * 所有SessionAttributeStore
      */
-    private List<SessionAttributeStore>        stores;
+    private List<SessionAttributeStore> stores;
 
     private Map<String, SessionAttributeStore> storesMap;
 
     /**
      * 属性信息管理
      */
-    private AttributesConfigManager            attributesConfigManager;
+    private AttributesConfigManager attributesConfigManager;
 
     public MonoHttpSession() {
 
     }
 
     /**
-     * @param monoRequest
-     * @param monoResponse
-     * @param servletContext，javax.servlet.ServletContext
-     * @param stores，所有SessionStore
-     * @param attributesConfig，属性配置信息
+     * @param monoRequest             MonoHttpServletRequest
+     * @param monoResponse            MonoHttpServletResponse
+     * @param httpSession             HttpSession
+     * @param stores                  所有SessionStore
+     * @param attributesConfigManager AttributesConfigManager
      */
     public MonoHttpSession(MonoHttpServletRequest monoRequest, MonoHttpServletResponse monoResponse,
                            HttpSession httpSession, List<SessionAttributeStore> stores,
@@ -79,9 +75,8 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
         this.request = monoRequest;
         this.response = monoResponse;
         this.stores = stores;
-        this.srcHttpSession = httpSession;
+        this.session = httpSession;
         this.attributesConfigManager = attributesConfigManager;
-        this.creationTime = System.currentTimeMillis();
     }
 
     @Override
@@ -91,17 +86,21 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     @Override
     public String getId() {
-        return this.srcHttpSession.getId();
+        return this.session.getId();
+    }
+
+    public void setLastAccessedTime(long lastAccessedTime) {
+        this.lastAccessedTime = lastAccessedTime;
     }
 
     @Override
     public long getLastAccessedTime() {
-        return this.creationTime;
+        return this.lastAccessedTime;
     }
 
     @Override
     public ServletContext getServletContext() {
-        return srcHttpSession.getServletContext();
+        return session.getServletContext();
     }
 
     @Override
@@ -127,7 +126,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     /**
      * 从store里取
-     * 
+     *
      * @param name
      * @return
      */
@@ -161,7 +160,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     /**
      * 决定store
-     * 
+     *
      * @param attrConfig
      * @return
      */
@@ -266,7 +265,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     }
 
     public String getSessionId() {
-        return this.srcHttpSession.getId();
+        return this.session.getId();
     }
 
     public List<SessionAttributeStore> getStores() {

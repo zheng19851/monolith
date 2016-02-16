@@ -1,52 +1,45 @@
 package com.runssnail.monolith.session;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
-
 import com.runssnail.monolith.session.attibute.AttributesConfigManager;
 import com.runssnail.monolith.session.attibute.DefaultAttributesConfigManager;
 import com.runssnail.monolith.session.store.CookieSessionAttributeStore;
 import com.runssnail.monolith.session.store.SessionAttributeStore;
+import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * monolith session filter
- * 
+ *
  * @author wade.zheng
  * @date：2011-6-15
  */
-
 public class MonoHttpSessionFilter implements Filter {
 
-    private static final Logger         log                             = Logger.getLogger(MonoHttpSessionFilter.class);
+    private static final Log log = LogFactory.getLog(MonoHttpSessionFilter.class);
 
     /**
      * session 属性管理器
      */
-    private AttributesConfigManager     attributesConfigManager;
+    private AttributesConfigManager attributesConfigManager;
 
     /**
      * SessionAttributeStore
      */
     private List<SessionAttributeStore> stores;
 
-    private static final String         ATTRIBUTES_CONFIG_MANAGER_CLASS = "attributesConfigManager";
+    private static final String ATTRIBUTES_CONFIG_MANAGER_CLASS = "attributesConfigManager";
 
-    private static final String         SESSION_STORES                  = "sessionStores";
+    private static final String SESSION_STORES = "sessionStores";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -68,7 +61,7 @@ public class MonoHttpSessionFilter implements Filter {
             if (sessionStores.contains(",")) {
                 sessionStoresArr = sessionStores.split(",");
             } else {
-                sessionStoresArr = new String[] { sessionStores };
+                sessionStoresArr = new String[]{sessionStores};
             }
 
             if (stores == null) {
@@ -125,11 +118,11 @@ public class MonoHttpSessionFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-                                                                                             ServletException {
+            ServletException {
         // 对于重入的filter，不消化exception。
         // 在weblogic中，servlet forward到jsp时，jsp仍会调用此filter，而jsp抛出的异常就会被该filter捕获。
         if (!(request instanceof HttpServletRequest && response instanceof HttpServletResponse)
-            || (request.getAttribute(getClass().getName()) != null)) {
+                || (request.getAttribute(getClass().getName()) != null)) {
             chain.doFilter(request, response);
             return;
         }
@@ -147,10 +140,11 @@ public class MonoHttpSessionFilter implements Filter {
 
         try {
             chain.doFilter(monoRequest, monoResponse);
+        } finally {
+
             if (session != null) {
                 session.commit(); // 将修改过的cookie添加到response里
             }
-        } finally {
 
             // 将缓存数据写进response流里
             monoResponse.commitBuffer();
@@ -160,7 +154,7 @@ public class MonoHttpSessionFilter implements Filter {
 
     /**
      * 创建session
-     * 
+     *
      * @param monoRequest
      * @param monoResponse
      * @param httpSession
@@ -170,14 +164,14 @@ public class MonoHttpSessionFilter implements Filter {
                                                   MonoHttpServletResponse monoResponse, HttpSession httpSession) {
         List<SessionAttributeStore> stores = getStores();
         MonoHttpSession session = new MonoHttpSession(monoRequest, monoResponse, httpSession, stores,
-                                                      attributesConfigManager);
+                attributesConfigManager);
         session.init();
         return session;
     }
 
     /**
      * 获取SessionStores
-     * 
+     *
      * @return
      */
     private List<SessionAttributeStore> getStores() {
