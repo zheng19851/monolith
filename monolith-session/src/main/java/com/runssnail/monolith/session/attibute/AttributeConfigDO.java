@@ -2,15 +2,15 @@ package com.runssnail.monolith.session.attibute;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import com.runssnail.monolith.session.store.CookieSessionAttributeStore;
+import com.runssnail.monolith.session.store.CookieSessionStore;
 
 import java.io.Serializable;
 
 /**
- * cookieÅäÖÃÐÅÏ¢
+ * cookieï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
  * 
  * @author zhengwei
- * @date£º2011-6-15
+ * @dateï¿½ï¿½2011-6-15
  */
 
 public class AttributeConfigDO implements Serializable {
@@ -18,47 +18,47 @@ public class AttributeConfigDO implements Serializable {
     private static final long serialVersionUID = 3190254383299004162L;
 
     /**
-     * ³ÌÐòÖÐÊ¹ÓÃµÄÊôÐÔµÄÃû×Ö£¬¶ÔÓ¦ÓÚHttpSession.getAttribute()·½·¨µÄ²ÎÊý
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½HttpSession.getAttribute()ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½
      */
     private String  key;
 
     /**
-     * ±£´æµ½¿Í»§¶ËÊ±Ê¹ÓÃµÄÃû×Ö
+     * ï¿½ï¿½ï¿½æµ½ï¿½Í»ï¿½ï¿½ï¿½Ê±Ê¹ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½
      */
     private String  clientKey;
 
     /**
-     * ÊÇ·ñÐèÒª¼ÓÃÜ
+     * ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½
      */
     private boolean encrypt    = true;
 
     /**
-     * ÓÃÄÄÖÖÀàÐÍµÄstore´æ´¢, Ä¬ÈÏÊÇCookieSessionAttributeStore
+     * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½storeï¿½æ´¢, Ä¬ï¿½ï¿½ï¿½ï¿½CookieSessionAttributeStore
      */
-    private String  storeKey   = CookieSessionAttributeStore.class.getSimpleName();
+    private String  storeKey   = CookieSessionStore.class.getSimpleName();
 
     /**
-     * ´æ´¢µÄÉúÃüÖÜÆÚ£¬¼´Ê§Ð§Ê±¼ä
+     * ï¿½æ´¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½Ê§Ð§Ê±ï¿½ï¿½
      */
     private int     lifeCycle  = -1;
 
     /**
-     * cookieµÄÓòÃû
+     * cookieï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
      */
     private String  domain     = "localhost";
 
     /**
-     * cookieµÄÂ·¾¶
+     * cookieï¿½ï¿½Â·ï¿½ï¿½
      */
     private String  cookiePath = "/";
 
     /**
-     * cookieµÄhttpOnlyÊôÐÔ
+     * cookieï¿½ï¿½httpOnlyï¿½ï¿½ï¿½ï¿½
      */
     private boolean httpOnly;
 
     /**
-     * ÊÇ·ñÊÇÖ»¶ÁÊôÐÔ£¬Ò»°ãÖ»ÓÃÓÚsessionID
+     * ï¿½Ç·ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½Ô£ï¿½Ò»ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½sessionID
      */
     private boolean readOnly;
 
@@ -90,7 +90,7 @@ public class AttributeConfigDO implements Serializable {
     }
 
     /**
-     * ÄÚ²¿key
+     * ï¿½Ú²ï¿½key
      * 
      * @return
      */
@@ -103,7 +103,7 @@ public class AttributeConfigDO implements Serializable {
     }
 
     /**
-     * ±£´æÔÚ¿Í»§¶ËµÄÃû³Æ
+     * ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿Í»ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½
      * 
      * @return
      */
@@ -116,7 +116,7 @@ public class AttributeConfigDO implements Serializable {
     }
 
     /**
-     * ÊÇ·ñ¼ÓÃÜ
+     * ï¿½Ç·ï¿½ï¿½ï¿½ï¿½
      * 
      * @return
      */

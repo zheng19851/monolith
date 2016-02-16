@@ -2,9 +2,13 @@ package com.runssnail.monolith.session;
 
 import com.runssnail.monolith.session.attibute.AttributesConfigManager;
 import com.runssnail.monolith.session.attibute.DefaultAttributesConfigManager;
-import com.runssnail.monolith.session.store.CookieSessionAttributeStore;
-import com.runssnail.monolith.session.store.SessionAttributeStore;
-import org.apache.commons.lang.ClassUtils;
+import com.runssnail.monolith.session.store.CookieSessionStore;
+import com.runssnail.monolith.session.store.DefaultSessionStoreFactory;
+import com.runssnail.monolith.session.store.SessionStore;
+import com.runssnail.monolith.session.store.SessionStoreFactory;
+import com.runssnail.monolith.session.utils.ClassUtils;
+import com.runssnail.monolith.session.utils.ConfigUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,8 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * monolith session filter
@@ -32,65 +35,78 @@ public class MonoHttpSessionFilter implements Filter {
      */
     private AttributesConfigManager attributesConfigManager;
 
-    /**
-     * SessionAttributeStore
-     */
-    private List<SessionAttributeStore> stores;
+    private SessionStoreFactory sessionStoreFactory;
 
     private static final String ATTRIBUTES_CONFIG_MANAGER_CLASS = "attributesConfigManager";
 
-    private static final String SESSION_STORES = "sessionStores";
+    private static final Class<? extends SessionStore>[] DEFAULT_STORE_CLASSES = new Class[] { CookieSessionStore.class};
+
+    private static final String ADDITIONAL_STORE_CLASSES = "additionalStoreClasses";
+
+    private static final String STORE_POSTFIX = "Store";
+
+    private static final char STANDARD_NAME_SEPARATOR = '-';
+
+    private FilterConfig filterConfig;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
-        loadAttributesConfigManager(filterConfig);
+        this.filterConfig = filterConfig;
 
-        loadSessionStores(filterConfig);
+        initAttributesConfigManager();
+
+        initSessionStoreFactory();
     }
 
-    private void loadSessionStores(FilterConfig filterConfig) throws ServletException {
-        if (filterConfig == null) {
-            return;
-        }
+    private void initSessionStoreFactory() {
+        Map<String, Class<? extends SessionStore>> storeTypeMap = new HashMap<String, Class<? extends SessionStore>>();
+        addDefaultStoreClassesToStoreTypeMap(storeTypeMap);
+        addAdditionalStoreClassesToStoreTypeMap(storeTypeMap);
 
-        // 设置sessionStores
-        String sessionStores = filterConfig.getInitParameter(SESSION_STORES);
-        if (StringUtils.isNotBlank(sessionStores)) {
-            String[] sessionStoresArr = null;
-            if (sessionStores.contains(",")) {
-                sessionStoresArr = sessionStores.split(",");
-            } else {
-                sessionStoresArr = new String[]{sessionStores};
-            }
-
-            if (stores == null) {
-                this.stores = new ArrayList<SessionAttributeStore>(sessionStoresArr.length);
-            }
-
-            for (String storeClazz : sessionStoresArr) {
-                try {
-                    Class clazz = ClassUtils.getClass(storeClazz);
-                    SessionAttributeStore store = (SessionAttributeStore) clazz.newInstance();
-                    if (this.stores.contains(store)) {
-                        throw new RuntimeException("duplicate SessionAttributeStore, class of (" + storeClazz + ")");
-                    }
-                    this.stores.add(store);
-                } catch (Exception e) {
-                    throw new ServletException(e);
-                }
-            }
-
-        }
-
-        if (this.stores == null) {
-            this.stores = new ArrayList<SessionAttributeStore>(1);
-            this.stores.add(new CookieSessionAttributeStore());
-        }
-
+        DefaultSessionStoreFactory sessionStoreFactory = new DefaultSessionStoreFactory();
+        sessionStoreFactory.setStoreTypeMap(storeTypeMap);
+        this.sessionStoreFactory = sessionStoreFactory;
     }
 
-    private void loadAttributesConfigManager(FilterConfig filterConfig) throws ServletException {
+    private void addAdditionalStoreClassesToStoreTypeMap(Map<String, Class<? extends SessionStore>> storeTypeMap) {
+        String param = filterConfig.getInitParameter(ADDITIONAL_STORE_CLASSES);
+        String[] additionalStoreClassNames = ConfigUtils.splitConfig(param);
+        if (!ArrayUtils.isEmpty(additionalStoreClassNames)) {
+            for (String className : additionalStoreClassNames) {
+                Class<? extends SessionStore> storeClass = ClassUtils.findClass(className, SessionStore.class);
+                addToStoreTypeMap(storeClass, storeTypeMap);
+            }
+        }
+    }
+
+    private void addDefaultStoreClassesToStoreTypeMap(Map<String, Class<? extends SessionStore>> storeTypeMap) {
+        for (Class<? extends SessionStore> storeClass : DEFAULT_STORE_CLASSES) {
+            addToStoreTypeMap(storeClass, storeTypeMap);
+        }
+    }
+
+    private void addToStoreTypeMap(Class<? extends SessionStore> storeClass,
+                                   Map<String, Class<? extends SessionStore>> storeTypeMap) {
+        String className = storeClass.getSimpleName();
+        String standardName = convertClassNameToStandardName(className, STORE_POSTFIX);
+        storeTypeMap.put(standardName, storeClass);
+    }
+
+    /**
+     * 将形式如"AbcDefStore"的类名(假设postfix为"Store")，转换为形式如"abc-def"的标准名称
+     */
+    private String convertClassNameToStandardName(String className, String postfix) {
+        if (StringUtils.endsWith(className, postfix)) {
+            className = StringUtils.substringBeforeLast(className, postfix);
+        }
+        String[] words = StringUtils.splitByCharacterTypeCamelCase(className);
+        String joinedWords = StringUtils.join(words, STANDARD_NAME_SEPARATOR);
+        String standardName = StringUtils.lowerCase(joinedWords);
+        return standardName;
+    }
+
+    private void initAttributesConfigManager() throws ServletException {
         if (filterConfig == null) {
             return;
         }
@@ -100,10 +116,10 @@ public class MonoHttpSessionFilter implements Filter {
 
         if (StringUtils.isNotBlank(attributesConfigManagerClazz)) {
             try {
-                Class clazz = ClassUtils.getClass(attributesConfigManagerClazz);
+                Class clazz = ClassUtils.findClass(attributesConfigManagerClazz, AttributesConfigManager.class);
                 attributesConfigManager = (AttributesConfigManager) clazz.newInstance();
             } catch (Exception e) {
-                throw new ServletException(e);
+                throw new RuntimeException(e);
             }
         }
 
@@ -142,9 +158,7 @@ public class MonoHttpSessionFilter implements Filter {
             chain.doFilter(monoRequest, monoResponse);
         } finally {
 
-            if (session != null) {
-                session.commit(); // 将修改过的cookie添加到response里
-            }
+            session.commit(); // 将修改过的cookie添加到response里
 
             // 将缓存数据写进response流里
             monoResponse.commitBuffer();
@@ -162,38 +176,16 @@ public class MonoHttpSessionFilter implements Filter {
      */
     private MonoHttpSession createMonoHttpSession(MonoHttpServletRequest monoRequest,
                                                   MonoHttpServletResponse monoResponse, HttpSession httpSession) {
-        List<SessionAttributeStore> stores = getStores();
-        MonoHttpSession session = new MonoHttpSession(monoRequest, monoResponse, httpSession, stores,
+        Map<String, SessionStore> stores = this.sessionStoreFactory.createStores();
+        MonoHttpSession session = new MonoHttpSession(monoRequest, monoResponse, this.filterConfig.getServletContext(), stores,
                 attributesConfigManager);
         session.init();
         return session;
     }
 
-    /**
-     * 获取SessionStores
-     *
-     * @return
-     */
-    private List<SessionAttributeStore> getStores() {
-
-        if (this.stores != null) {
-            return this.stores;
-        }
-
-        List<SessionAttributeStore> stores = new ArrayList<SessionAttributeStore>(1);
-        CookieSessionAttributeStore cookieStore = new CookieSessionAttributeStore();
-        stores.add(cookieStore);
-        return stores;
-    }
-
     @Override
     public void destroy() {
         this.attributesConfigManager.destroy();
-        if (this.stores != null && !this.stores.isEmpty()) {
-            for (SessionAttributeStore store : this.stores) {
-                store.destroy();
-            }
-        }
     }
 
     public void setAttributesConfigManager(AttributesConfigManager attributesConfigManager) {

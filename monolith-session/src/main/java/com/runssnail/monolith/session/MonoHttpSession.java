@@ -1,8 +1,11 @@
 package com.runssnail.monolith.session;
 
+import com.runssnail.monolith.lang.UniqID;
 import com.runssnail.monolith.session.attibute.AttributeConfigDO;
 import com.runssnail.monolith.session.attibute.AttributesConfigManager;
-import com.runssnail.monolith.session.store.SessionAttributeStore;
+import com.runssnail.monolith.session.store.SessionStore;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,6 +25,8 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     private static final Log log = LogFactory.getLog(MonoHttpSession.class);
 
+    public static final String SESSION_ID = "sessionID";
+
     /**
      *
      */
@@ -29,10 +34,9 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     private MonoHttpServletResponse response;
 
-    /**
-     * servlet 容器创建的session
-     */
-    private HttpSession session;
+    private volatile String sessionId;
+
+    private volatile ServletContext context;
 
     /**
      * session 创建时间
@@ -49,9 +53,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     /**
      * 所有SessionAttributeStore
      */
-    private List<SessionAttributeStore> stores;
-
-    private Map<String, SessionAttributeStore> storesMap;
+    private Map<String, SessionStore> stores;
 
     /**
      * 属性信息管理
@@ -65,17 +67,16 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     /**
      * @param monoRequest             MonoHttpServletRequest
      * @param monoResponse            MonoHttpServletResponse
-     * @param httpSession             HttpSession
+     * @param context                 ServletContext
      * @param stores                  所有SessionStore
      * @param attributesConfigManager AttributesConfigManager
      */
-    public MonoHttpSession(MonoHttpServletRequest monoRequest, MonoHttpServletResponse monoResponse,
-                           HttpSession httpSession, List<SessionAttributeStore> stores,
-                           AttributesConfigManager attributesConfigManager) {
+    public MonoHttpSession(MonoHttpServletRequest monoRequest, MonoHttpServletResponse monoResponse, ServletContext context,
+                           Map<String, SessionStore> stores, AttributesConfigManager attributesConfigManager) {
         this.request = monoRequest;
         this.response = monoResponse;
+        this.context = context;
         this.stores = stores;
-        this.session = httpSession;
         this.attributesConfigManager = attributesConfigManager;
     }
 
@@ -86,7 +87,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     @Override
     public String getId() {
-        return this.session.getId();
+        return this.sessionId;
     }
 
     public void setLastAccessedTime(long lastAccessedTime) {
@@ -100,7 +101,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
 
     @Override
     public ServletContext getServletContext() {
-        return session.getServletContext();
+        return this.context;
     }
 
     @Override
@@ -135,7 +136,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
         return processAttribute(name, new Callback() {
 
             @Override
-            public Object doCallback(SessionAttributeStore store, AttributeConfigDO ac) {
+            public Object doCallback(SessionStore store, AttributeConfigDO ac) {
                 return store.getAttribute(ac);
             }
 
@@ -154,7 +155,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
             return null;
         }
 
-        SessionAttributeStore store = resolveStore(attributeConfigDO);
+        SessionStore store = resolveStore(attributeConfigDO);
         return callback.doCallback(store, attributeConfigDO);
     }
 
@@ -164,8 +165,8 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
      * @param attrConfig
      * @return
      */
-    private SessionAttributeStore resolveStore(AttributeConfigDO attrConfig) {
-        return storesMap.get(attrConfig.getStoreKey());
+    private SessionStore resolveStore(AttributeConfigDO attrConfig) {
+        return this.stores.get(attrConfig.getStoreKey());
     }
 
     /**
@@ -198,7 +199,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
         processAttribute(name, new Callback() {
 
             @Override
-            public Object doCallback(SessionAttributeStore store, AttributeConfigDO ac) {
+            public Object doCallback(SessionStore store, AttributeConfigDO ac) {
                 store.setAttribute(ac, value);
                 return null;
             }
@@ -240,7 +241,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     public void commit() {
         try {
 
-            for (SessionAttributeStore store : stores) {
+            for (SessionStore store : stores.values()) {
                 store.commit();
             }
         } catch (Exception e) {
@@ -265,11 +266,7 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     }
 
     public String getSessionId() {
-        return this.session.getId();
-    }
-
-    public List<SessionAttributeStore> getStores() {
-        return stores;
+        return this.sessionId;
     }
 
     /**
@@ -278,27 +275,46 @@ public class MonoHttpSession implements HttpSession, Lifecycle {
     public void init() {
 
         initStores();
+        fetchSessionId();
+        notifyStoresSessionReady();
+    }
 
+    private void notifyStoresSessionReady() {
+        // 只初始化用到的store
+        for (SessionStore store : this.stores.values()) {
+            store.onSessionReady();
+        }
+    }
+
+    private void fetchSessionId() {
+        // 先尝试从cookie中获取
+        sessionId = (String) getAttribute(SESSION_ID);
+
+        // 如果cookie中没有，则生成新的sessionId，并写入cookie中
+        if (StringUtils.isBlank(sessionId)) {
+            sessionId = generateSessionId();
+            setAttribute(SESSION_ID, sessionId);
+        }
+    }
+
+    private String generateSessionId() {
+        return DigestUtils.md5Hex(UniqID.getInstance().getUniqID());
     }
 
     /**
      * 初始化stores
      */
     private void initStores() {
-        if (stores != null) {
-            storesMap = new HashMap<String, SessionAttributeStore>(stores.size());
-            for (SessionAttributeStore store : stores) {
-                store.init();
-                store.init(this);
-                storesMap.put(store.getClass().getSimpleName(), store);
-            }
+        for (SessionStore store : stores.values()) {
+            store.init();
+            store.init(this);
         }
 
     }
 
     private interface Callback {
 
-        Object doCallback(SessionAttributeStore store, AttributeConfigDO ac);
+        Object doCallback(SessionStore store, AttributeConfigDO ac);
     }
 
     @Override

@@ -11,7 +11,7 @@ import com.runssnail.monolith.session.attibute.AttributeConfigDO;
  * @date：2011-6-15
  */
 
-public interface SessionAttributeStore extends Lifecycle {
+public interface SessionStore extends Lifecycle {
 
     /**
      * 获取属性值
@@ -40,5 +40,7 @@ public interface SessionAttributeStore extends Lifecycle {
      * @param session
      */
     public void init(MonoHttpSession session);
+
+    void onSessionReady();
 
 }

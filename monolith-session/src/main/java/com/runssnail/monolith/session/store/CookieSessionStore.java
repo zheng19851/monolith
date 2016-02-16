@@ -24,7 +24,7 @@ import java.util.Set;
  * @date£º2011-6-15
  */
 
-public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
+public class CookieSessionStore extends AbstractSessionStore {
 
     /**
      * session
@@ -238,5 +238,7 @@ public class CookieSessionAttributeStore extends AbstractSessionAttributeStore {
         return monoHttpSession.getRequest();
     }
 
-   
+    public void onSessionReady() {
+        // ignore
+    }
 }

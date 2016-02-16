@@ -11,7 +11,7 @@ import java.util.Map;
  * 
  * @author zhengwei
  */
-public class MemorySessionAttributeStore extends AbstractSessionAttributeStore {
+public class MemorySessionStore extends AbstractSessionStore {
 
     private Map<String, Object> attributes = new HashMap<String, Object>();
 
